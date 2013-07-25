@@ -1,0 +1,401 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    
+    <meta charset="UTF-8" />
+    <title>Backstab - Basic CRUD</title>
+	
+	<link href="../css/style.css" type="text/css" rel="stylesheet" media="screen" />
+	
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js" type="text/javascript"></script>
+	<script src="http://documentcloud.github.com/underscore/underscore-min.js" type="text/javascript"></script>
+	<script src="http://documentcloud.github.com/backbone/backbone-min.js" type="text/javascript"></script>
+	
+	<script src="../etc/jquery.tmpl.js" type="text/javascript"></script>
+	
+	<script src="../backstab/underscore.js" type="text/javascript"></script>
+	<script src="../backstab/core.js" type="text/javascript"></script>
+	
+	<script src="../backstab/view.js" type="text/javascript"></script>
+	<script src="../backstab/dispatcher.js" type="text/javascript"></script>
+	<script src="../backstab/foo.js" type="text/javascript"></script>
+	
+	
+	
+	<style type="text/css">
+		
+		#songform label.title {
+			font-weight: bold;
+		}
+		
+		#songform label.field {
+			width: 90px;
+			display: inline-block;
+		}
+		
+	</style>
+	
+	<script type="text/javascript">
+		
+		//
+		Backstab.latchToBackbone( 'View', 'Dispatcher', 'Foo' );
+		
+		
+		//// class declarations
+		
+		/* /
+		// var Foo = Backstab.Foo.extend( { } );
+		var Foo = Backbone.Foo.extend( { } );
+		var oFoo = new Foo();
+		oFoo.foo();
+		/* */
+		
+		
+		//// models
+		
+		// song
+		var Song = Backbone.Model.extend( {
+			defaults: {
+				name: 'Not specified',
+				artist: 'Not specified',
+				duration: '0:00'
+			}
+		} );
+		
+		//// collections
+		
+		// album
+		var Album = Backbone.Collection.extend( {
+			model: Song
+		} );
+		
+		
+		//// views
+		
+		// list
+		var ListView = Backbone.View.extend( {
+			
+			events: {
+				'collection:initialize; collection:add': 'addSong',
+				'dispatcher:deleteSong': 'deleteSong'
+			},
+			
+			tagName: 'ul',
+			
+			_items: [],
+			
+			dispatcher: Backbone.Dispatcher.global,
+			
+			
+			
+			addSong: function( e, song ) {
+				var item = new ItemView( { model: song } );
+				this._items.push( item );
+				this.$el.append( item.render().$el );
+				return item;
+			},
+			
+			deleteSong: function( e, song, item ) {
+				this._items = _.without( this._items, item );
+				this.collection.remove( song );
+			},
+			
+			render: function() {
+				return this;		
+			},
+			
+			test: function() {
+				
+				var some = '';
+				
+				$.each( this._items, function( i, v ) {
+					some += ' (' + v + ') ';
+				} );
+				
+				alert( some );
+			}
+			
+		} );
+		
+		
+		// item
+		var ItemView = Backbone.View.extend( {
+			
+			events: {
+				'click .edit': 'editItem',
+				'click .del': 'deleteItem',
+				'model:change': 'updateSong'
+			},
+			
+			dispatcher: Backstab.Dispatcher.global,
+			
+			initialize: function() {
+				this.$el = $( '#song-tmpl' ).tmpl( {} );
+			},
+			
+			updateSong: function() {
+				this._unloadFromModel();			
+			},
+			
+			render: function() {
+				this.updateSong();
+				return this;
+			},
+			
+			editItem: function() {
+				this.dispatcher.trigger( 'editSong', this.model );
+				return false;			
+			},
+			
+			deleteItem: function() {
+				this.dispatcher.trigger( 'deleteSong', this.model, this );
+				this.remove();
+				return false;			
+			}
+			
+		} );
+		
+		
+		// form
+		var FormView = Backbone.View.extend( {
+
+			events: {
+				'click .add': 'addItem',
+				'click .update': 'updateItem',
+				'dispatcher:editSong': 'editSong',
+				'dispatcher:bogus .title': 'fooBar',
+				'dispatcher:blarg .name': 'gooBar'
+			},
+			
+			fooBar: function( e, val ) {
+				// $( e.target ).html( val );
+				// alert( $( e.target ).prop( 'tagName' ) );
+				// _.showMe( val );
+				_.showMe( e );
+			},
+
+			gooBar: function( e, val ) {
+				// $( e.target ).html( val );
+				// alert( $( e.target ).prop( 'tagName' ) );
+				// _.showMe( val );
+				_.showMe( e );
+			},
+			
+			dispatcher: Backstab.Dispatcher.global,
+			
+			initialize: function() {
+				
+				// references
+				this.$titleMode = this.$el.find( '.title .mode' );
+				this.$addBtn = this.$el.find( 'input.add' );
+				this.$updateBtn = this.$el.find( 'input.update' );
+				
+				this.$el.hide();
+				
+			},
+			
+			addSong: function( album ) {
+				
+				this._album = album;			// ??????
+				
+				this.$titleMode.html( 'Add' );
+				
+				// reset the form
+				this.$el.find( 'input[type="text"]' ).val( '' );
+				
+				this.$addBtn.show();
+				this.$updateBtn.hide();
+				
+				this.$el.show();				
+			},
+			
+			editSong: function( e, song ) {
+				
+				this._song = song;				// ??????
+				
+				this.$titleMode.html( 'Update' );
+				
+				// unload data from model to the form
+				this._unloadFromModel( song );
+				
+				this.$addBtn.hide();
+				this.$updateBtn.show();
+				
+				this.$el.show();			
+			},
+			
+			
+			addItem: function() {
+				
+				var song = new Song();
+				this._loadToModel( song );
+				
+				this._album.add( song );
+				
+				this.$el.hide();
+				
+			},
+
+			updateItem: function() {
+				
+				this._loadToModel( this._song );
+				
+				this.$el.hide();
+				
+			}
+			
+		} );
+		
+		
+ 		//// execute
+		
+		jQuery( document ).ready( function( $ ) {			
+			
+			//// model
+			
+			var song1 = new Song( { name: 'How Bizarre', artist: 'OMC', duration: '2:33' } );
+			var song2 = new Song( { name: 'Sexual Healing', artist: 'Marvin Gaye', duration: '5:40' } );
+			var song3 = new Song( { name: 'Talk It Over In Bed', artist: 'OMC', duration: '3:19' } );
+			var song4 = new Song( { name: 'Stillnes Is The Move', artist: 'Dirty Projectors', duration: '5:01' } );
+			var song5 = new Song( { name: 'Mr. Roboto', artist: 'Styx', duration: '3:10' } );
+			
+			var songs = [ song1, song2, song3, song4, song5 ];
+			
+			var myAlbum = new Album( songs );
+			// console.log( myAlbum.models );
+			
+			
+			//// views
+			
+			var songlist = new ListView( {
+				collection: myAlbum,
+				el: $( '#songlist' )
+			} );
+			
+
+			var form = new FormView( {
+				el: $( '#songform' )
+			} );
+			
+			
+			//// react
+			
+			
+			
+			
+			
+			
+			//// invoke
+
+			$( '#add_song' ).click( function() {
+				form.addSong( myAlbum );
+				return false;
+			} );
+			
+			
+			
+			//
+			$( '#ctl_1' ).click( function() {
+				_.showMe( myAlbum.models );
+				return false;
+			} );
+
+			//
+			$( '#ctl_2' ).click( function() {
+				songlist.test();
+				return false;
+			} );			
+			
+			$( '#ctl_3' ).click( function() {
+				
+				var newalbum = new Album();
+				var newlist = new ListView( {
+					collection: newalbum
+				} );
+				
+				var list2 = $( '#list2' );
+				
+				list2.append( '<a href="#">Add Song!<\/a><br />' );
+				list2.append( newlist.render().$el );
+				
+				list2.find( 'a' ).on( 'click', function() {
+					form.addSong( newalbum );
+					return false;
+				} );
+				
+				return false;
+			} );
+
+			//
+			$( '#ctl_4' ).click( function() {
+				
+				// this.$el.find( '.title' ).trigger( 'dispatcher:bogus' );
+				Backstab.Dispatcher.global.trigger( 'bogus', 'do ewt' );
+				
+				return false;
+			} );			
+			
+		} );
+		
+	</script>
+
+
+</head>
+
+<body>
+
+<h2>Backstab - Basic CRUD</h2>
+
+<hr />
+
+<table><tr><td>
+
+	<a href="#" id="add_song">Add Song</a>
+	
+	<br />
+	
+	<ul id="songlist">
+		<script id="song-tmpl" type="text/x-jquery-tmpl">  
+			<li>
+				[ <a href="#" class="del">del</a> | <a href="#" class="edit">edit</a> ] 
+				&nbsp;&nbsp;&nbsp; 
+				<span class="name"></span> 
+				(<span class="artist"></span>) 
+				&nbsp;&nbsp;&nbsp;
+				<span class="duration"></span>
+			</li>
+		</script>
+	</ul>
+
+</td><td>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</td><td id="list2">
+
+
+
+</td></tr></table>
+
+<form id="songform">
+	
+	<label class="title"><span class="mode"></span> Song:</label><br />
+	
+	<label class="field">Name:</label> <input type="text" class="name" /><br />
+	<label class="field">Artist:</label> <input type="text" class="artist" /><br />
+	<label class="field">Duration:</label> <input type="text" class="duration" /><br />
+	
+	<input type="button" class="add" value="Add" />
+	<input type="button" class="update" value="Update" />
+	
+</form>
+
+<hr />
+
+<a href="#" id="ctl_1">View Collection</a> | 
+<a href="#" id="ctl_2">List View</a> | 
+<a href="#" id="ctl_3">New List</a> | 
+<a href="#" id="ctl_4">Trigger Dispatcher</a>
+
+
+</body>
+
+</html>
