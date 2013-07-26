@@ -149,9 +149,11 @@ Specifying related events can be made more concise using a curly brace {} notati
 ```javascript
 
 events: {
-	'fruit:pick:{ apple; pear; banana } div.title'
+	'fruit:pick:{ apple; pear; banana } div.title': 'updateTitle'
 	// same as:
-	// 'fruit:pick:apple div.title; fruit:pick:pear div.title; fruit:pick:banana div.title'
+	// 'fruit:pick:apple div.title': 'updateTitle',
+	// 'fruit:pick:pear div.title': 'updateTitle',
+	// 'fruit:pick:banana div.title': 'updateTitle'
 }
 
 ```
@@ -161,9 +163,12 @@ Nested curly braces {} work!
 ```javascript
 
 events: {
-	'fruit:pick:{ apple:{ green; red; }; pear; } div.title'
+	'fruit:pick:{ apple:{ green; red }; pear; banana } div.title': 'updateTitle'
 	// same as:
-	// 'fruit:pick:apple:green div.title; fruit:pick:apple:red div.title; fruit:pick:pear div.title'
+	// 'fruit:pick:apple:green div.title': 'updateTitle',
+	// 'fruit:pick:apple:red div.title': 'updateTitle',
+	// 'fruit:pick:pear div.title': 'updateTitle',
+	// 'fruit:pick:banana div.title': 'updateTitle'
 }
 
 ```
