@@ -25,6 +25,11 @@ Backstab (Core)
 Backstab.View
 ---------------
 
+`Backstab.View` makes a number of enhancements to the standard `Backbone.View` `events` hash.
+
+View properties that have an `on()` method are detected when initializing the view object. Events 
+can then be delegated using <property name>:<event name> syntax.
+
 ```javascript
 
 // model
@@ -55,8 +60,14 @@ var ItemView = Backstab.View.extend( {
 var ListView = Backstab.View.extend( {
 	
 	events: {
+		
 		// other events ...
 		'collection:initialize; collection:add': 'addSong'
+		
+		// the abvove is the same as the following two lines:
+		// 'collection:initialize': 'addSong',
+		// 'collection:add': 'addSong'
+		
 	},
 
 	addSong: function( e, song ) {
@@ -88,6 +99,29 @@ jQuery( document ).ready( function( $ ) {
 } );
 
 ```
+
+Callback value can be an array, the first value being the name of the method or actual function. 
+The rest of the parameters are passed to the callback.
+
+```javascript
+
+var SomeView = Backstab.View.extend( {
+	
+	events: {
+		'click #apple, #banana, #orange': [ 'whatAmI', 'fruit' ],
+		'click #carrot, #broccoli': [ 'whatAmI', 'vegetable' ],
+		'click #bacon, #ham, #steak': [ 'whatAmI', 'meat' ]
+	},
+	
+	whatAmI: function( e, type ) {
+		alert( $( e.target ).attr( 'id' ) + ' ' +  type );
+		// click on #carrot -> 'carrot vegetable'
+	}
+	
+}
+
+```
+
 
 Backstab.Dispatcher
 ---------------------
