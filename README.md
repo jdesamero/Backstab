@@ -27,8 +27,33 @@ Backstab.View
 
 `Backstab.View` makes a number of enhancements to the standard `Backbone.View` `events` hash.
 
+```javascript
+
+// standard usage
+events: {
+	'someevent someselector': 'someMethod',
+	'otherevent otherselector': 'otherMethod',
+	// etc...
+}
+```
+
+Multiple event/selector combos can be separated using a semi-colon (;) which can target the same 
+method.
+
+```javascript
+
+// standard usage
+events: {
+	'someevent someselector; otherevent otherselector': 'sameMethod'
+	// etc...
+}
+```
+
 View properties that have an `on()` method are detected when initializing the view object. Events 
-can then be delegated using <property name>:<event name> syntax.
+can then be delegated using _&lt;property name&gt;:&lt;event name&gt;'_ syntax.
+
+View properties that have an `each()` method can trigger an `initialize` event. When the view is 
+initialized, the members of the property are iterated and passed to the callback method.
 
 ```javascript
 
@@ -49,27 +74,24 @@ var ItemView = Backstab.View.extend( {
 		// other events
 		'model:change': 'updateSong'
 	},
-
-	updateSong: function() {
+	
+	updateSong: function( e, model ) {
 		// do stuff
 	}
 	
 } );
 
+
 // list view
 var ListView = Backstab.View.extend( {
 	
 	events: {
-		
 		// other events ...
-		'collection:initialize; collection:add': 'addSong'
-		
-		// the abvove is the same as the following two lines:
-		// 'collection:initialize': 'addSong',
-		// 'collection:add': 'addSong'
-		
+		'collection:initialize; collection:add': 'addSong'		
 	},
-
+	
+	// same method is used when initializing existing songs
+	// as well as the addition of new songs
 	addSong: function( e, song ) {
 		var item = new ItemView( { model: song } );
 		this._items.push( item );
@@ -114,10 +136,34 @@ var SomeView = Backstab.View.extend( {
 	},
 	
 	whatAmI: function( e, type ) {
-		alert( $( e.target ).attr( 'id' ) + ' ' +  type );
-		// click on #carrot -> 'carrot vegetable'
+		alert( $( e.target ).attr( 'id' ) + ' is a ' +  type );
+		// click on #carrot -> 'carrot is a vegetable'
 	}
 	
+}
+
+```
+
+Specifying related events can be made more concise using a curly brace {} notation.
+
+```javascript
+
+events: {
+	'fruit:pick:{ apple; pear; banana } div.title'
+	// same as:
+	// 'fruit:pick:apple div.title; fruit:pick:pear div.title; fruit:pick:banana div.title'
+}
+
+```
+
+Nested curly braces {} work!
+
+```javascript
+
+events: {
+	'fruit:pick:{ apple:{ green; red; }; pear; } div.title'
+	// same as:
+	// 'fruit:pick:apple:green div.title; fruit:pick:apple:red div.title; fruit:pick:pear div.title'
 }
 
 ```
@@ -301,12 +347,11 @@ var InfoView = Backbone.View.extend( {
 Backstab.Foo
 --------------
 
-
+This is a template for adding your own Backstab sub-classes.
 
 ```javascript
 
-// var Foo = Backstab.Foo.extend( { } );
-var Foo = Backbone.Foo.extend( { } );
+var Foo = Backstab.Foo.extend( { } );
 var oFoo = new Foo();
 oFoo.foo();
 
