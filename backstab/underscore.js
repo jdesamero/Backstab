@@ -1,4 +1,13 @@
-// Enhancements to underscore.js for use by Backstab
+/*
+ * "backstab/underscore.js"
+ * https://github.com/jdesamero/Backstab
+ *
+ * Copyright (c) 2013 Joel Desamero.
+ * Licensed under the MIT license.
+ *
+ * Enhancements to "Underscore.js" for use by Backstab
+ */
+
 ( function() {
 	
 	var _ = this._;

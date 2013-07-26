@@ -1,4 +1,15 @@
-// depends on "backstab/core.js", "dependencies/state-machine.js"
+/*
+ * "backstab/state-machine.js"
+ * https://github.com/jdesamero/Backstab
+ *
+ * Copyright (c) 2013 Joel Desamero.
+ * Licensed under the MIT license.
+ *
+ * depends on "backstab/core.js"
+ * depends on "dependencies/state-machine.js"
+ * 		https://github.com/jakesgordon/javascript-state-machine
+ */
+ 
 ( function() {
 	
 	var Backbone = this.Backbone;

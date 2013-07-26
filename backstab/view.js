@@ -1,4 +1,13 @@
-// depends on "backstab/core.js"
+/*
+ * "backstab/view.js"
+ * https://github.com/jdesamero/Backstab
+ *
+ * Copyright (c) 2013 Joel Desamero.
+ * Licensed under the MIT license.
+ *
+ * depends on "backstab/core.js"
+ */
+
 ( function() {
 	
 	var Backbone = this.Backbone;
