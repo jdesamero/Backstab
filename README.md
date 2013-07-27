@@ -34,7 +34,7 @@ method.
 
 ```javascript
 
-// standard usage
+// extended usage
 events: {
 	'someevent someselector; otherevent otherselector': 'sameMethod'
 	// etc...
