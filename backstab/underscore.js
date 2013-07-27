@@ -14,93 +14,112 @@
 	
 	//// added functions
 	
-	// _.beginsWith() function
-	
-	if ( !_.beginsWith ) {
+	var funclist = {
 		
-		_.beginsWith = function( haystack, needle ) {
-			
-			if ( 'string' !== $.type( haystack ) ) {
-				alert( 'Backstab: _.beginsWith( haystack, needle ): invalid first parameter (haystack) provided!' );			
-			}
-			
-			if ( 'string' === $.type( needle ) ) {
+		beginsWith: {
+			func: function( haystack, needle ) {
 				
-				// return "true" if needle begins with string, otherwise return "false"
-				return ( haystack.substring( 0, needle.length ) === needle ) ? true : false;
-			
-			} else if ( 'array' === $.type( needle ) ) {
-				
-				// if *haystack* begins with any of the values in *needle* array, return the matching value
-				// otherwise, return "false"
-				var len = needle.length;
-				
-				for ( var i = 0; i < len; i++ ) {
-					if ( _.beginsWith( haystack, needle[ i ] ) ) {
-						return needle[ i ];
-					}
+				if ( 'string' !== $.type( haystack ) ) {
+					alert( 'Backstab: _.beginsWith( haystack, needle ): invalid first parameter (haystack) provided!' );			
 				}
 				
-				return false;			
-			}
-			
-			alert( 'Backstab: _.beginsWith( haystack, needle ): invalid second parameter (needle) provided!' );
-			
-			return null;
-		};
-		
-		_.beginsWith.backstab = true;		// check
-		
-	} else {
-		
-		if ( !_.beginsWith.backstab ) {
-			alert( 'Backstab: conflict with _.beginsWith()!' );
-		}
-	}
-	
-	// _.showMe() function, for debugging
-	
-	if ( !_.showMe ) {
-		
-		_.showMe = function() {
-			var args = $.makeArray( arguments );
-			var obj = ( args.length > 1 ) ? args : args[ 0 ] ;
-			alert( JSON.stringify( obj ) );
-		};
-		
-		_.showMe.backstab = true;		// check
-		
-	} else {
-		
-		if ( !_.showMe.backstab ) {
-			alert( 'Backstab: conflict with _.showMe()!' );
-		}
-	}
-	
-	//// overrides
-	
-	// make _.contains() work with strings
-	// eg: _.contains( 'The quick brown fox...', 'quick' ) -> true
-	
-	if ( !_.containsOrig ) {
-		
-		_.containsOrig = _.contains;
-
-		_.contains = function( subject, value ) {
-			if ( ( 'string' === $.type( subject ) ) && ( 'string' === $.type( value ) ) ) {
-				return ( subject.indexOf( value ) !== -1 ) ? true : false ;
-			}
-			return _.containsOrig( subject, value );
-		};
-		
-		_.containsOrig.backstab = true;		// check
+				if ( 'string' === $.type( needle ) ) {
+					
+					// return "true" if needle begins with string, otherwise return "false"
+					return ( haystack.substring( 0, needle.length ) === needle ) ? true : false;
 				
-	} else {
+				} else if ( 'array' === $.type( needle ) ) {
+					
+					// if *haystack* begins with any of the values in *needle* array, return the matching value
+					// otherwise, return "false"
+					var len = needle.length;
+					
+					for ( var i = 0; i < len; i++ ) {
+						if ( _.beginsWith( haystack, needle[ i ] ) ) {
+							return needle[ i ];
+						}
+					}
+					
+					return false;			
+				}
+				
+				alert( 'Backstab: _.beginsWith( haystack, needle ): invalid second parameter (needle) provided!' );
+				
+				return null;
+			}
+		},
 		
-		if ( !_.containsOrig.backstab ) {
-			alert( 'Backstab: conflict with _.containsOrig()!' );
-		}
-	}
+		expandCurlyShortform: {
+			func: function( evtsel ) {
+				
+				var curlyRegex = /([^ ]+?)\{([^\{\}]+?)\}([^;\{\}]*)/g;
+				
+				if ( _.contains( evtsel, '{' ) ) {
+					
+					var regs = false, exp = '', subs = [];
+					
+					// pass 1.1
+					while( regs = curlyRegex.exec( evtsel ) ) {
+						// _.showMe( regs );
+						exp = '';
+						subs = regs[ 2 ].split( ';' );
+						$.each( subs, function( i, v ) {
+							if ( exp ) exp += '; ';
+							exp += regs[ 1 ] + $.trim( v ) + regs[ 3 ];
+						} );
+						evtsel = evtsel.replace( regs[ 0 ], exp );
 	
+						// _.showMe( evtsel );
+					}
+					
+					// _.showMe( evtsel );
+					
+					// do this recursively
+					evtsel = _.expandCurlyShortform( evtsel );
+				}
+				
+				return evtsel;
+			}
+		},
+		
+		showMe: {
+			func: function() {
+				var args = $.makeArray( arguments );
+				var obj = ( args.length > 1 ) ? args : args[ 0 ] ;
+				alert( JSON.stringify( obj ) );
+			}
+		},
+		
+		containsOrig: {
+			init: function() {
+				_.containsOrig = _.contains;
+			},
+			func: function( subject, value ) {
+				if ( ( 'string' === $.type( subject ) ) && ( 'string' === $.type( value ) ) ) {
+					return ( subject.indexOf( value ) !== -1 ) ? true : false ;
+				}
+				return _.containsOrig( subject, value );
+			}		
+		}
+		
+	};
+	
+	// load function list
+	$.each( funclist, function( funcName, v ) {
+
+		if ( !_[ funcName ] ) {
+			
+			if ( v.init ) v.init();
+			_[ funcName ] = v.func;
+			_[ funcName ].backstab = true;		// check
+			
+		} else {
+			
+			if ( !_[ funcName ].backstab ) {
+				alert( 'Backstab: conflict with _.' + funcName + '()!' );
+			}		
+		}
+		
+	} );
 	
 } ).call( this );
