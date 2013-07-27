@@ -221,7 +221,7 @@ var iAnimDelay = 1000;
 
 //// states
 
-var SliderState = Backbone.StateMachine.extend( {
+var SliderState = Backstab.StateMachine.extend( {
 	events: [
 		{ name: 'startup', from: 'none', to: 'transpicker' },
 		
@@ -243,7 +243,7 @@ var goSliderState = new SliderState();
 
 // slider
 		
-var SliderView = Backbone.View.extend( {
+var SliderView = Backstab.View.extend( {
 	
 	events: {
 		
@@ -300,7 +300,7 @@ var SliderView = Backbone.View.extend( {
 } );
 
 // control buttons
-var ControlsView = Backbone.View.extend( {
+var ControlsView = Backstab.View.extend( {
 	
 	events: {
 		'click #ctl_1': [ 'goTo', 'results' ],
@@ -324,7 +324,7 @@ var ControlsView = Backbone.View.extend( {
 
 
 // control buttons
-var InfoView = Backbone.View.extend( {
+var InfoView = Backstab.View.extend( {
 
 	events: {
 				
