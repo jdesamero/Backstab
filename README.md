@@ -6,12 +6,12 @@ Backstab provides enhancements to Backbone.js.
 Index
 -------
     
-- ``Backstab.View``. _&lt;content to come&gt;
-- ``Backstab.Dispatcher``. _&lt;content to come&gt;
-- ``Backstab.StateMachine``. _&lt;content to come&gt;
-- ``Backstab.Foo``. _&lt;content to come&gt;
-- ``Backstab`` (Core). _&lt;content to come&gt;
-- ``Backstab`` (Underscore.js Enhancements). _&lt;content to come&gt;
+- ``Backstab.View``. _&lt;content to come&gt;_
+- ``Backstab.Dispatcher``. _&lt;content to come&gt;_
+- ``Backstab.StateMachine``. _&lt;content to come&gt;_
+- ``Backstab.Foo``. _&lt;content to come&gt;_
+- ``Backstab`` (Core). _&lt;content to come&gt;_
+- ``Backstab`` (Underscore.js Enhancements). _&lt;content to come&gt;_
 
 
 Backstab.View
@@ -406,12 +406,12 @@ Backstab (Underscore.js Enhancements)
 
 The following functions are added to the Underscore.js namespace, which are used in Backstab:
 
-- ``_.beginsWith( haystack, needle )``. &lt;content to come&gt;
-- ``_.expandCurlyShortform( expression )``. &lt;content to come&gt;
-- ``_.showMe( val )``. &lt;content to come&gt;
+- ``_.beginsWith( haystack, needle )``. _&lt;content to come&gt;_
+- ``_.expandCurlyShortform( expression )``. _&lt;content to come&gt;_
+- ``_.showMe( val )``. _&lt;content to come&gt;_
 
 The following functions are overloaded, original functionality should not be affected:
 
-- ``_.contains( subject, value )``. &lt;content to come&gt;
+- ``_.contains( subject, value )``. _&lt;content to come&gt;_
 
 
