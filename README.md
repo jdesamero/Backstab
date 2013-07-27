@@ -415,3 +415,8 @@ The following functions are overloaded, original functionality should not be aff
 - ``_.contains( subject, value )``. _&lt;content to come&gt;_
 
 
+License
+=========
+Copyright (c) 2013 Joel Desamero
+Licensed under the MIT license.
+
