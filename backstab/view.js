@@ -64,35 +64,6 @@
 			var _this = this;
 			
 			//
-			var curlyRegex1 = /([^ ]+?)\{([^\{\}]+?)\}([^;\{\}]*)/g;
-			var curlyParse = function( evtsel ) {
-				
-				if ( _.contains( evtsel, '{' ) ) {
-					
-					var regs = false, exp = '', subs = [];
-					
-					// pass 1.1
-					while( regs = curlyRegex1.exec( evtsel ) ) {
-						// _.showMe( regs );
-						exp = '';
-						subs = regs[ 2 ].split( ';' );
-						$.each( subs, function( i, v ) {
-							if ( exp ) exp += '; ';
-							exp += regs[ 1 ] + $.trim( v ) + regs[ 3 ];
-						} );
-						evtsel = evtsel.replace( regs[ 0 ], exp );
-
-						// _.showMe( evtsel );
-					}
-					
-					// _.showMe( evtsel );
-					evtsel = curlyParse( evtsel );
-				}
-				
-				return evtsel;
-			};
-			
-			//
 			var copyMethod = function( method ) {
 				if ( 'array' === $.type( method ) ) {
 					return method.slice( 0 );	// make a copy
@@ -109,7 +80,7 @@
 				$.each( obj.events, function( evtsel, method ) {
 					
 					var orig = evtsel;
-					evtsel = curlyParse( evtsel );
+					evtsel = _.expandCurlyShortform( evtsel );
 					
 					// _.showMe( evtsel );
 					
@@ -193,8 +164,38 @@
 				} );
 			}
 			
+			var hasEach = [];
+			$.each( view, function( name, val ) {
+				if ( val.each && ( 'function' == $.type( val.each ) ) ) {
+					hasEach.push( name );
+				}
+			} );
+			
 			var delegate = {};
 			
+			// helpers
+			
+			//
+			var resolveTarget = function( elem, sel ) {
+				if ( sel ) {
+					var subtgt = elem.find( sel );
+					if ( subtgt.length > 0 ) return subtgt;
+				}
+				return elem;	
+			};
+			
+			//
+			var getDelegateSelector = function( prop, evt ) {
+				if (
+					( delegate[ prop ] ) && 
+					( typeof delegate[ prop ][ evt ] !== 'undefined' )
+				) {
+					return delegate[ prop ][ evt ];
+				};
+				return null;
+			};
+			
+			//
 			$.each( view.events, function( evtsel, method ) {
 				
 				var func = null;
@@ -214,9 +215,7 @@
 					
 					if ( !delegate[ prop ] ) delegate[ prop ] = {};
 					
-					var target = view.$el;
-					
-					var sel = null, part1 = null, part2 = null, pos = null, subtgt = null, evt = null, on = false;
+					var sel = '', part1 = '', part2 = '', pos = null, evt = null, on = false;
 					
 					part1 = prop + ':';
 					part2 = $.trim( evtsel.substring( part1.length ) );
@@ -230,18 +229,17 @@
 					
 					evt = $.trim( part1 + part2 );
 					
-					if ( sel ) {
-						subtgt = target.find( sel );
-						if ( subtgt.length > 0 ) target = subtgt;
-					}
-					
+					var target = resolveTarget( view.$el, sel );
+										
 					if ( evt ) {
 						func = _.bind( func, view );
-						if ( 'collection:initialize' == evt ) target.on( evt, func );
+						var hasEachProp = _.beginsWith( evt, hasEach );
+						if ( hasEachProp && ( ( hasEachProp + ':initialize' ) == evt ) ) {
+							target.on( evt, func );
+						}
 					}
 				}
 			} );
-			
 			
 			// _.showMe( delegate );
 			
@@ -254,26 +252,27 @@
 						var args = $.makeArray( arguments );
 						var evt = args.shift();
 						var event = prop + ':' + evt;
-						var sel = null, target = view.$el, subtgt = null;
+						var sel = getDelegateSelector( prop, evt );
 						
-						if (
-							( delegate[ prop ] ) && 
-							( typeof delegate[ prop ][ evt ] !== 'undefined' )
-						) {
+						if ( null !== sel ) {
 							sel = delegate[ prop ][ evt ];
-							if ( sel ) {
-								subtgt = view.$el.find( sel );
-								if ( subtgt.length > 0 ) target = subtgt;
-							}
+							var target = resolveTarget( view.$el, sel );
 							target.trigger( event, args );
 						}
 						
 					} );
 					
-					if ( 'collection' == prop ) {
-						view.collection.each( function( model ) {
-							view.$el.trigger( 'collection:initialize', [ model ] );
-							// _.showMe( model );
+					// trigger now
+					if ( _.contains( hasEach, prop ) ) {
+						view[ prop ].each( function() {
+							var args2 = $.makeArray( arguments );
+							var evt = 'initialize';
+							var sel = getDelegateSelector( prop, evt );
+							if ( null !== sel ) {
+								var target = resolveTarget( view.$el, sel );
+								target.trigger( prop + ':' + evt, args2 );
+							}
+							// _.showMe( args2 );
 						} );
 					}
 				}
