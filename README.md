@@ -213,9 +213,9 @@ var ListView = Backstab.View.extend( {
 Backstab.StateMachine
 -----------------------
 
-A state machine modelled under standard Backbone.js sub-classes.
-
-Requires [Javascript Finite State Machine (v2.2.0)](https://github.com/jakesgordon/javascript-state-machine)
+A state machine modelled after standard Backbone.js sub-classes. It is actually a wrapper for 
+[Javascript Finite State Machine (v2.2.0)](https://github.com/jakesgordon/javascript-state-machine) 
+(required).
 
 ```javascript
 
