@@ -6,7 +6,7 @@ Backstab provides enhancements to Backbone.js.
 Index
 -------
     
-- ``Backstab.View``. makes a number of enhancements to the standard `Backbone.View` `events` hash.
+- ``Backstab.View``. Makes a number of enhancements to the standard `Backbone.View` `events` hash.
 - ``Backstab.Dispatcher``. Provides a way for views to communicate without directly referencing each other.
 - ``Backstab.StateMachine``. A state machine modelled after standard Backbone.js sub-classes.
 - ``Backstab.Foo``. This is a template for adding your own Backstab sub-classes.

@@ -155,9 +155,6 @@
 			state: goSliderState,
 			
 			goTo: function( e, dest ) {
-				// alert( e.type );
-				// _.showMe( e );
-				// alert( e.target );
 				this.state.trigger( 'goto' + dest );
 				return false;
 			},
@@ -173,10 +170,6 @@
 		var InfoView = Backbone.View.extend( {
 
 			events: {
-				
-				// 'mice:smell:{ furdi; pudgy; ratzo } a.mouse; color:{ red; green; blue }; do:ewt; click .foot': 'bogusMethod',
-				// 'mice:smell:{ furdi; pudgy; ratzo:{ momew; babew } } a.mouse; color:{ red; green; blue:{ dark; medium; light } }; do:ewt; click .foot': 'bogusMethod',
-				// 'mice:smell:{ furdi; pudgy; ratzo:{ momew p; babew } div } a.mouse; color:{ red; green; blue:{ dark; medium; light } }; do:ewt; click .foot': 'bogusMethod',
 				
 				'state:enter:picker': [ 'onPanel', 'Picker' ],
 				'state:enter:results': [ 'onPanel', 'Results Page' ],
@@ -207,49 +200,11 @@
 			var controls = new ControlsView( { el: $( '#controls' ) } );
 			var info = new InfoView( { el: $( '#info' ) } );			
 			
-			
-			
 			// goSliderState.trigger( 'gotoresults' );
 			// alert( goSliderState.current );
-
-			//
-			$( '#ctl_6' ).click( function() {
-				
-				var some = [ 'miso', 'piso', 'gizzo' ];
-				
-				var doIt = function( p1, p2, p3, p4 ) {
-					alert( p1 + ' : ' + p2 + ' : ' + p3 + ' : ' + p4 );
-				};
-				
-				var doStuff = function( pfx, some ) {
-					some.unshift( pfx );
-					doIt.apply( this, some );
-					some.shift();
-				};
-				
-				doStuff( 'apple', some );
-				doStuff( 'banana', some );
-				doStuff( 'orange', some );
-				
-				return false;
-			} );
-
+			
 			goSliderState.startup();
-			
-			// alert( _.beginsWith( 'spiderball is cute!', [ 'rat', 'furdi', 'pudgy' ] ) );
-			
-			/* /
-			var test = {
-				animal: 'mouse',
-				color: 'gray',
-				type: 'tyrant'
-			};
-			
-			delete test.type;
-			
-			_.showMe( test );
-			/* */
-			
+						
 		} );
 		
 	</script>
@@ -274,8 +229,6 @@
 
 <div id="info"></div>
 
-<div id="poink">Poink!!!</div>
-
 <br />
 
 <hr />
@@ -285,14 +238,6 @@
 	<a href="#" id="ctl_2">Go to Details</a> | 
 	<a href="#" id="ctl_3">Go to Picker</a>
 </div>
-
-<br />
-<br />
-<br />
-
-<a href="#" id="ctl_4">Remove Poink</a> | 
-<a href="#" id="ctl_5">Check State Elems</a> | 
-<a href="#" id="ctl_6">Test Array</a>
 
 
 </body>

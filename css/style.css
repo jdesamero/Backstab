@@ -9,4 +9,11 @@ td {
 	vertical-align: top;
 }
 
+a.whiteout {
+	color: #fff;
+}
+
+a.whiteout:hover {
+	color: #000;
+}
 
