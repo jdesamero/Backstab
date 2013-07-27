@@ -6,20 +6,12 @@ Backstab provides enhancements to Backbone.js.
 Index
 -------
     
-- ``Backstab (Underscore.js Enhancements)``. <content to come>
-- ``Backstab (Core)``. <content to come>
 - ``Backstab.View``. <content to come>
 - ``Backstab.Dispatcher``. <content to come>
 - ``Backstab.StateMachine``. <content to come>
 - ``Backstab.Foo``. <content to come>
-
-
-Backstab (Underscore.js Enhancements)
----------------------------------------
-
-
-Backstab (Core)
------------------
+- ``Backstab (Core)``. <content to come>
+- ``Backstab (Underscore.js Enhancements)``. <content to come>
 
 
 Backstab.View
@@ -361,4 +353,55 @@ var oFoo = new Foo();
 oFoo.foo();
 
 ```
+
+Backstab (Core)
+-----------------
+
+The main Backstab object provides the namespace for the various Backstab sub-classes. I also offers 
+loading/override functionality if you want to use the standard Backbone namespace.
+
+```javascript
+
+Backstab.latchToBackbone( 'View', 'Dispatcher', 'Foo' );
+
+// Backbone.View.extend is now Backstab.View.extend
+var ListView = Backbone.View.extend( {
+	...
+} );
+
+// Backbone.Dispatcher.extend is now Backstab.Dispatcher.extend
+var Dispatcher = Backbone.Dispatcher.extend( {
+	...
+} );
+
+// Backbone.Foo.extend is now Backstab.Foo.extend
+var Foo = Backbone.Foo.extend( {
+	...
+} );
+
+```
+
+The `latchToBackbone()` method can be called directly on the sub-class, if preferred.
+
+```javascript
+
+Backstab.View.latchToBackbone();
+// same as:
+// Backstab.latchToBackbone( 'View' );
+
+```
+
+Backstab (Underscore.js Enhancements)
+---------------------------------------
+
+The following functions are added to the Underscore.js namespace, which are used in Backstab:
+
+- ``_.beginsWith( haystack, needle )``. <content to come>
+- ``_.expandCurlyShortform( expression )``. <content to come>
+- ``_.showMe( val )``. <content to come>
+
+The following functions are overloaded, original functionality should not be affected:
+
+- ``_.contains( subject, value )``. <content to come>
+
 
