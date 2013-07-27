@@ -42,7 +42,7 @@ events: {
 ```
 
 View properties that have an `on()` method are detected when initializing the view object. Events 
-can then be delegated using _&lt;property name&gt;:&lt;event name&gt;'_ syntax.
+can then be delegated using _&lt;property name&gt;:&lt;event name&gt;_ syntax.
 
 View properties that have an `each()` method can trigger an `initialize` event. When the view is 
 initialized, the members of the property are iterated and passed to the callback method.
@@ -269,18 +269,28 @@ var SliderView = Backbone.View.extend( {
 		var eH2 = eLi.find( 'h2' );
 		
 		if ( trigger == 'enter' ) {
-
+			
+			// currently in some transition state:
+			// 'transresults', 'transdetails', or 'transpicker'
 			eH2.fadeIn( iAnimDelay, function() {
+				
 				eLi.addClass( 'active' );
+				
+				// once animation is completed, go to final state:
+				// 'results', 'details', or 'picker'
 				_this.state.trigger( 'goto' + st );
 			} );
 
 		} else if ( trigger == 'leave' ) {
-
+			
+			// hold current state
 			_this.state.hold();
 			
 			eH2.fadeOut( iAnimDelay, function() {
+				
 				eLi.removeClass( 'active' );
+				
+				// release when animation has completed
 				_this.state.release();
 			} );
 			
