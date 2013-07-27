@@ -417,6 +417,6 @@ The following functions are overloaded, original functionality should not be aff
 
 License
 =========
-Copyright (c) 2013 Joel Desamero
+Copyright (c) 2013 Joel Desamero  
 Licensed under the MIT license.
 
