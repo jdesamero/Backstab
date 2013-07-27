@@ -6,12 +6,12 @@ Backstab provides enhancements to Backbone.js.
 Index
 -------
     
-- ``Backstab.View``. _&lt;content to come&gt;_
-- ``Backstab.Dispatcher``. _&lt;content to come&gt;_
-- ``Backstab.StateMachine``. _&lt;content to come&gt;_
-- ``Backstab.Foo``. _&lt;content to come&gt;_
-- ``Backstab`` (Core). _&lt;content to come&gt;_
-- ``Backstab`` (Underscore.js Enhancements). _&lt;content to come&gt;_
+- ``Backstab.View``. makes a number of enhancements to the standard `Backbone.View` `events` hash.
+- ``Backstab.Dispatcher``. Provides a way for views to communicate without directly referencing each other.
+- ``Backstab.StateMachine``. A state machine modelled after standard Backbone.js sub-classes.
+- ``Backstab.Foo``. This is a template for adding your own Backstab sub-classes.
+- ``Backstab`` (Core). The main Backstab object provides the namespace for the various Backstab sub-classes. It also offers loading/override functionality if you want to use the standard Backbone namespace.
+- ``Backstab`` (Underscore.js Enhancements). Backstab adds some more utility functions to the Underscore.js namespace.
 
 
 Backstab.View
@@ -213,6 +213,8 @@ var ListView = Backstab.View.extend( {
 Backstab.StateMachine
 -----------------------
 
+A state machine modelled under standard Backbone.js sub-classes.
+
 Requires [Javascript Finite State Machine (v2.2.0)](https://github.com/jakesgordon/javascript-state-machine)
 
 ```javascript
@@ -349,6 +351,9 @@ var InfoView = Backstab.View.extend( {
 	
 } );
 
+// shows current state
+alert( goSliderState.current );
+
 ```
 
 Backstab.Foo
@@ -367,7 +372,7 @@ oFoo.foo();
 Backstab (Core)
 -----------------
 
-The main Backstab object provides the namespace for the various Backstab sub-classes. I also offers 
+The main Backstab object provides the namespace for the various Backstab sub-classes. It also offers 
 loading/override functionality if you want to use the standard Backbone namespace.
 
 ```javascript
@@ -404,7 +409,9 @@ Backstab.View.latchToBackbone();
 Backstab (Underscore.js Enhancements)
 ---------------------------------------
 
-The following functions are added to the Underscore.js namespace, which are used in Backstab:
+Backstab adds some more utility functions to the Underscore.js namespace.
+
+The following functions are added:
 
 - ``_.beginsWith( haystack, needle )``. _&lt;content to come&gt;_
 - ``_.expandCurlyShortform( expression )``. _&lt;content to come&gt;_
