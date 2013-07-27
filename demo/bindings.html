@@ -27,13 +27,19 @@
 	<script type="text/javascript">
 		
 		//
-		// Backstab.latchToBackbone( 'View', 'StateMachine' );
+		Backstab.latchToBackbone( 'View', 'StateMachine' );
 		
 		// control buttons
 		var ControlsView = Backbone.View.extend( {
 			
 			events: {
 				'click #ctl_1, #ctl_2, #ctl_3': 'sayMyName'
+			},
+			
+			foo: {
+				a: $( '#ctl_1' ),
+				b: $( '#ctl_2' ),
+				c: $( '#ctl_3' ),
 			},
 			
 			sayMyName: function( e, msg ) {
@@ -47,6 +53,54 @@
 		jQuery( document ).ready( function( $ ) {			
 			
 			var controls = new ControlsView( { el: $( '#controls' ) } );
+			
+			
+			var test = {
+				fruit: {
+					apple: {
+						color: 'green',
+						taste: 'sweet'
+					},
+					banana: {
+						color: 'red'
+					}
+				},
+				vegetable: false,
+				meat: 'bacon',
+				pork: 3,
+				doEwt: new function() {
+					this.color = 'green';
+				},
+				smellew: function() {
+					this.color = 'red';
+				}
+			};
+			
+			test.fruit.red = test;
+			
+			//
+			var getValue = function( subject, sPath ) {
+				
+				sPath = $.trim( sPath );
+				if ( !sPath ) return subject;
+				
+				var aPath = sPath.split( '.' );
+				var bFail = false;
+				$.each( aPath, function( i, prop ) {
+					if ( subject[ prop ] ) {
+						subject = subject[ prop ];
+					} else {
+						bFail = true;
+						return false;
+					}
+				} );
+				
+				return ( bFail ) ? false : subject ;
+			};
+			
+			// _.showMe( getValue( test, 'doEwt.color' ) );
+			_.showMe( getValue( test, 'fruit.red.meat' ) );
+			
 			
 		} );
 		

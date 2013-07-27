@@ -86,7 +86,14 @@
 			func: function() {
 				var args = $.makeArray( arguments );
 				var obj = ( args.length > 1 ) ? args : args[ 0 ] ;
-				alert( JSON.stringify( obj ) );
+				var seen = [];
+				alert( JSON.stringify( obj, function( key, val ) {
+					if ( typeof val == 'object' ) {
+						if ( seen.indexOf( val ) >= 0 ) return;
+						seen.push( val );
+					}
+					return val;
+				} ) );
 			}
 		},
 		

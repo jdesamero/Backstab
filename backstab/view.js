@@ -156,12 +156,35 @@
 			var props = this._props;
 			
 			if ( 'array' !== $.type( props ) ) {
+				
 				props = [];
-				$.each( view, function( name, val ) {
-					if ( val.on && ( 'function' == $.type( val.on ) ) ) {
-						props.push( name );
-					}
-				} );
+				var seen = [];
+				
+				var getProps = function( obj, path, level ) {
+					
+					if ( level > 0 ) return;
+					
+					$.each( obj, function( name, val ) {
+						
+						if ( _.contains( [ 'el', '$el', 'options', '_byId' ], name ) ) return;
+						
+						if ( val && val.on && ( 'function' === $.type( val.on ) ) ) {
+							props.push( path + name );
+						}
+						if (
+							( 'object' === $.type( val ) ) && 
+							( seen.indexOf( val ) == -1 )
+						) {
+							seen.push( val );
+							getProps( val, path + name + '.', level + 1 );
+							// _.showMe( val, path + name + '.', level + 1 );
+						}
+					} );
+				};
+				
+				getProps( view, '', 0 );
+				
+				// _.showMe( props );
 			}
 			
 			var hasEach = [];
