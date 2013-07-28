@@ -17,12 +17,27 @@
 	var funclist = {
 		
 		//// additions
+
+		consoleError: {
+			func: function( msg ) { console.error( msg ); }
+		},
+
+		consoleLog: {
+			func: function( msg ) { console.log( msg ); }
+		},
+		
+		showMe: {
+			func: function() {
+				var args = $.makeArray( arguments );
+				alert( _.stringify.apply( this, args ) );
+			}
+		},
 		
 		beginsWith: {
 			func: function( haystack, needle ) {
 				
 				if ( 'string' !== $.type( haystack ) ) {
-					alert( 'Backstab: _.beginsWith( haystack, needle ): invalid first parameter (haystack) provided!' );			
+					_.consoleError( 'Backstab Error: _.beginsWith( haystack, needle ): invalid first parameter (haystack) provided!' );			
 				}
 				
 				if ( 'string' === $.type( needle ) ) {
@@ -45,7 +60,7 @@
 					return false;			
 				}
 				
-				alert( 'Backstab: _.beginsWith( haystack, needle ): invalid second parameter (needle) provided!' );
+				_.consoleError( 'Backstab Error: _.beginsWith( haystack, needle ): invalid second parameter (needle) provided!' );
 				
 				return null;
 			}
@@ -177,14 +192,7 @@
 				} );
 			}
 		},
-		
-		showMe: {
-			func: function() {
-				var args = $.makeArray( arguments );
-				alert( _.stringify.apply( this, args ) );
-			}
-		},
-		
+				
 		//// overrides
 		
 		containsOrig: {
@@ -213,7 +221,7 @@
 		} else {
 			
 			if ( !_[ funcName ].backstab ) {
-				alert( 'Backstab: conflict with _.' + funcName + '()!' );
+				_.consoleError( 'Backstab Error: conflict with _.' + funcName + '()!' );
 			}		
 		}
 		

@@ -1,0 +1,90 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    
+    <meta charset="UTF-8" />
+    <title>QUnit - backstab/underscore.js</title>
+	<link href="http://code.jquery.com/qunit/qunit-1.12.0.css" rel="stylesheet" type="text/css" />
+
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js" type="text/javascript"></script>
+	<script src="http://documentcloud.github.com/underscore/underscore-min.js" type="text/javascript"></script>
+	<script src="http://documentcloud.github.com/backbone/backbone-min.js" type="text/javascript"></script>
+	
+	<script src="../backstab/underscore.js" type="text/javascript"></script>
+	
+</head>
+
+<body>
+
+<div id="qunit"></div>
+<div id="qunit-fixture"></div>
+<script src="http://code.jquery.com/qunit/qunit-1.12.0.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+
+var expected = function( actualRes, expectedRes, msg ) {
+	
+	var suffix = '';
+	var actualResStr = _.stringify( actualRes );
+	var expectedResStr = _.stringify( expectedRes );
+	
+	if ( actualRes === expectedRes ) {
+		suffix = ' (result: ' + actualResStr + ')';	
+	}
+	
+	msg = msg.replace( '##actual##', actualResStr ).replace( '##expected##', expectedResStr );
+	
+	equal( actualRes, expectedRes, msg + suffix );
+};
+
+test( "_.beginsWith()", function() {
+		
+	expected(
+		_.beginsWith( 'The quick brown fox...', 'The' ), true,
+		'"The quick brown fox..." begins with "The"'
+	);
+	
+	expected(
+		_.beginsWith( 'quick brown fox...', 'The' ), false,
+		'"quick brown fox..." does not begin with "The"'
+	);
+	
+	expected(
+		_.beginsWith( 'brown fox quick...', [ 'quick', 'brown', 'fox' ] ), 'brown',
+		'"brown fox quick..." begins with "quick", "brown", or "fox"'
+	);
+	
+	expected(
+		_.beginsWith( 'black fox quick...', [ 'quick', 'brown', 'fox' ] ), false,
+		'"black fox quick..." does not begin with "quick", "brown", or "fox"'
+	);
+	
+} );
+
+test( "_.expandCurlyShortform()", function() {
+	
+	expected(
+		_.expandCurlyShortform( 'click a' ), 'click a',
+		'Value (##actual##) should not change.'
+	);
+	
+	expected(
+		_.expandCurlyShortform( 'click #a, #b, #c' ), 'click #a, #b, #c',
+		'Value (##actual##) should not change.'
+	);
+	
+	var val1 = 'foo:{ bar; baz }';
+	expected(
+		_.expandCurlyShortform( 'foo:{ bar; baz }' ), 'foo:bar; foo:baz',
+		'Value (##actual##) should change to (##expected##).'
+	);
+	
+	ok( 'foo:bar; foo:baz; foo:' === _.expandCurlyShortform( 'foo:{ bar; baz; }' ), 'Passed!' );
+	
+} );
+
+</script>
+
+</body>
+
+</html>
