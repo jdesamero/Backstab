@@ -20,10 +20,13 @@
 	
 	//
 	_.extend( Backstab.Foo.prototype, Backstab.Events, {
+		
 		initialize: function() { },
-		foo: function() {
-			alert( 'Foo' );
+		
+		foo: function( msg ) {
+			alert( 'Foo ' + msg + '!!!' );
 		}
+				
 	} );
 	
 	//

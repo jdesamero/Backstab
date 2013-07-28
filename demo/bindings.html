@@ -28,11 +28,10 @@
 		var Foo = Backbone.Foo.extend( {
 			initialize: function( opts ) {
 				this.options = opts;
-				this.on( 'bar', function() {
-					// _.showMe( arguments );
-					// alert( this.options.bar );
-					// e.bar = this.options.bar;
-				} );
+			},
+			performBar: function( baz, quux ) {
+				// do stuff
+				this.trigger( 'bar', this, baz, quux );
 			}
 		} );
 		
@@ -61,8 +60,8 @@
 				return false;
 			},
 			
-			doBar: function( e ) {
-				alert( 'Do Bar!!! ' + e.bar  );
+			doBar: function( e, foo, baz, quux ) {
+				alert( foo.options.bar + '! ' + baz + ' --- ' + quux + '!!!' );
 			}
 			
 		} );
@@ -71,10 +70,14 @@
 		jQuery( document ).ready( function( $ ) {			
 			
 			var controls = new ControlsView( { el: $( '#controls' ) } );
-			
+
 			$( '#ctl_a' ).click( function() {
-				// alert( 'aaa' );
-				oFoo.a.trigger( 'bar' );
+				oFoo.a.foo( 'Yes' );
+				return false;
+			} );
+			
+			$( '#ctl_b' ).click( function() {
+				oFoo.a.performBar( 'A Horse', 'Of Course' );
 				return false;
 			} );
 			
@@ -112,7 +115,8 @@
 
 <hr />
 
-<a href="#" id="ctl_a">Trigger Foo</a>
+<a href="#" id="ctl_a">Trigger Foo</a> | 
+<a href="#" id="ctl_b">Perform Bar</a>
 
 </body>
 
