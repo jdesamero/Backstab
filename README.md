@@ -432,6 +432,7 @@ Backstab.createConstructor( 'Foo', {
 		alert( 'Bar!!!' );
 	}
 } );
+// at this point, Backstab.Foo is now defined
 
 // can latch to Backbone, if you wish
 Backstab.Foo.latchToBackbone();
