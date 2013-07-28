@@ -419,7 +419,7 @@ The following functions are added:
 - ``_.objectType( object )``. _&lt;content to come&gt;_
 - ``_.descendantsWithMethod( subject, method, maxLevels )``. _&lt;content to come&gt;_
 - ``_.stringify( arg1, arg2, ... argN )``. _&lt;content to come&gt;_
-- ``_.showMe( val )``. _&lt;content to come&gt;_
+- ``_.showMe( arg1, arg2, ... argN )``. _&lt;content to come&gt;_
 
 The following functions are overloaded, original functionality should not be affected:
 
