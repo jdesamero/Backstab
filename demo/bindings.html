@@ -26,9 +26,6 @@
 		Backstab.latchToBackbone( 'View', 'Foo' );
 		
 		var Foo = Backbone.Foo.extend( {
-			initialize: function( opts ) {
-				this.options = opts;
-			},
 			performBar: function( baz, quux ) {
 				// do stuff
 				this.trigger( 'bar', this, baz, quux );
@@ -36,7 +33,7 @@
 		} );
 		
 		var oFoo = {
-			a: new Foo( { bar: 'Hay' } ),
+			a: new Foo( { foo: 'Pool', bar: 'Hay' } ),
 			b: new Foo( { bar: 'Bee' } ),
 			c: new Foo( { bar: 'Sea' } )
 		};
@@ -91,6 +88,8 @@
 <body>
 
 <h1>Backstab - Bindings</h1>
+
+<p><a href="../index.html">Main Menu</a></p>
 
 <hr />
 
