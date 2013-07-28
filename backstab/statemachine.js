@@ -15,16 +15,10 @@
 	var Backbone = this.Backbone;
 	var Backstab = this.Backstab;
 	
-	/* */
-	Backstab.StateMachine = function() {
-		this.createSm.apply( this, arguments );
-		this.initialize.apply( this, arguments );
-	};
-	
 	//
-	_.extend( Backstab.StateMachine.prototype, Backstab.Events, {
+	Backstab.createConstructor( 'StateMachine', {
 		
-		createSm: function() {
+		setup: function() {
 			
 			var _this = this;
 			
@@ -75,8 +69,6 @@
 			} );
 			
 		},
-		
-		initialize: function() { },
 		
 		
 		initial: null,
@@ -190,20 +182,9 @@
 			_trigger( this._prefix + trigger, args );
 			_trigger( this._prefix + trigger + ':' + target, args );
 						
-		}		
-		
-		
+		}
 		
 	} );
-	
-	//
-	Backstab.StateMachine.extend = Backstab.extend;
-	
-	//
-	Backstab.StateMachine.latchToBackbone = function() {
-		Backbone.StateMachine = Backstab.StateMachine;
-		return this;
-	};
 	
 	
 } ).call( this );

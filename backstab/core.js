@@ -75,4 +75,42 @@
 		return this;
 	};
 	
+	// Backstab constructor template
+	Backstab.createConstructor = function( namespc, opts ) {
+		
+		//
+		var cons = function() {
+			
+			if ( this.setup ) {
+				this.setup.apply( this, arguments );
+			}
+
+			if ( this.initialize ) {
+				this.initialize.apply( this, arguments );
+			}
+
+			if ( this.afterInit ) {
+				this.afterInit.apply( this, arguments );
+			}
+		};
+		
+		//
+		_.extend( cons.prototype, Backstab.Events, opts );
+		
+		cons._namespace = namespc;
+		
+		cons.extend = Backstab.extend;
+		
+		cons.latchToBackbone = function() {
+			Backbone[ cons._namespace ] = this;
+			return this;
+		};
+		
+		// latch to Backstab namespace
+		Backstab[ cons._namespace ] = cons;
+		// alert( 'created constructor: ' + cons._namespace );
+		
+		return cons;
+	};
+	
 } ).call( this );
