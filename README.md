@@ -421,6 +421,30 @@ Backstab.View.latchToBackbone();
 
 ```
 
+The `createConstructor()` method offers and easy way to define a Backbone.js-style constructor.
+
+```javascript
+
+// first argument is the sub-class namespace
+Backstab.createConstructor( 'Foo', {
+	// prototype methods/properties go here
+	foo: function() {
+		alert( 'Bar!!!' );
+	}
+} );
+
+// can latch to Backbone, if you wish
+Backstab.Foo.latchToBackbone();
+
+var Foo = Backbone.Foo.extend( {
+	// more methods/properties/overrides
+} );
+
+var oFoo = new Foo();
+oFoo.foo();			// alert -> Bar!!!
+
+```
+
 Backstab (Underscore.js Enhancements)
 ---------------------------------------
 
