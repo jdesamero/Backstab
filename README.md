@@ -8,8 +8,8 @@ Index
     
 - ``Backstab.View``. Makes a number of enhancements to the standard `Backbone.View` `events` hash.
 - ``Backstab.Dispatcher``. Provides a way for views to communicate without directly referencing each other.
-- ``Backstab.StateMachine``. A state machine modelled after standard Backbone.js sub-classes.
-- ``Backstab.Foo``. This is a template for adding your own Backstab sub-classes.
+- ``Backstab.StateMachine``. A state machine that provides Backbone.js-style functionality.
+- ``Backstab.Foo``. An example sub-class that can be used as a guideline for creating your own Backstab sub-classes.
 - ``Backstab`` (Core). The main Backstab object provides the namespace for the various Backstab sub-classes. It also offers loading/override functionality if you want to use the standard Backbone namespace.
 - ``Backstab`` (Underscore.js Enhancements). Backstab adds some more utility functions to the Underscore.js namespace.
 
@@ -169,7 +169,7 @@ events: {
 Backstab.Dispatcher
 ---------------------
 
-Provides a way for views to communicate without directly referencing each other.
+`Backstab.Dispatcher` provides a way for views to communicate without directly referencing each other.
 
 ```javascript
 
@@ -213,7 +213,7 @@ var ListView = Backstab.View.extend( {
 Backstab.StateMachine
 -----------------------
 
-A state machine modelled after standard Backbone.js sub-classes. It is actually a wrapper for 
+`Backstab.StateMachine` provides Backbone.js-style functionality. It is actually a wrapper for 
 [Javascript Finite State Machine (v2.2.0)](https://github.com/jakesgordon/javascript-state-machine) 
 (required).
 
@@ -359,13 +359,28 @@ alert( goSliderState.current );
 Backstab.Foo
 --------------
 
-This is a template for adding your own Backstab sub-classes.
+`Backstab.Foo` is an example sub-class that can be used as a guideline for creating your own Backstab 
+sub-classes. Also used as a dummy class for unit testing.
 
 ```javascript
 
-var Foo = Backstab.Foo.extend( { } );
-var oFoo = new Foo();
-oFoo.foo();
+var Foo = Backstab.Foo.extend( {
+	
+	// before initialize() is called, a setup function is called that assigns the first argument
+	// ( opts ) to this.options
+	
+	initialize: function( opts, suffix ) {
+		alert( this.options.foo + suffix );
+	}
+	
+} );
+
+var oFoo = new Foo( { foo: 'bar' }, 'keep' );
+// alert -> 'barkeep'
+
+// foo() is a method that triggers the 'foo' event when called
+oFoo.foo( 'Yay' );
+// alert -> Calling Foo!!! (this.options.foo -> "bar") (msg -> "Yay")
 
 ```
 

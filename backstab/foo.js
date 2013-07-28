@@ -17,7 +17,8 @@
 	Backstab.createConstructor( 'Foo', {
 				
 		setup: function( opts ) {
-			this.options = opts;
+			this.options = $.extend( {}, opts );
+			return this;
 		},
 		
 		foo: function( msg ) {
