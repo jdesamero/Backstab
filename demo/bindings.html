@@ -23,26 +23,46 @@
 	<script type="text/javascript">
 		
 		//
-		Backstab.latchToBackbone( 'View' );
+		Backstab.latchToBackbone( 'View', 'Foo' );
+		
+		var Foo = Backbone.Foo.extend( {
+			initialize: function( opts ) {
+				this.options = opts;
+				this.on( 'bar', function() {
+					// _.showMe( arguments );
+					// alert( this.options.bar );
+					// e.bar = this.options.bar;
+				} );
+			}
+		} );
+		
+		var oFoo = {
+			a: new Foo( { bar: 'Hay' } ),
+			b: new Foo( { bar: 'Bee' } ),
+			c: new Foo( { bar: 'Sea' } )
+		};
 		
 		// control buttons
 		var ControlsView = Backbone.View.extend( {
 			
 			events: {
+				
 				'click #ctl_1, #ctl_2, #ctl_3': [ 'sayMyName', 'Fruit' ],
 				'click #ctl_4, #ctl_5, #ctl_6': [ 'sayMyName', 'Vegetable' ],
 				'click #ctl_7, #ctl_8': [ 'sayMyName', 'Meat' ],
+				
+				'foo.{ a:bar; b:bar; c:bar }': 'doBar'
 			},
 			
-			foo: {
-				a: $( '#ctl_1' ),
-				b: $( '#ctl_2' ),
-				c: $( '#ctl_3' ),
-			},
+			foo: oFoo,
 			
 			sayMyName: function( e, msg ) {
 				_.showMe( $( e.target ).html() + ' is a ' + msg );
 				return false;
+			},
+			
+			doBar: function( e ) {
+				alert( 'Do Bar!!! ' + e.bar  );
 			}
 			
 		} );
@@ -51,7 +71,13 @@
 		jQuery( document ).ready( function( $ ) {			
 			
 			var controls = new ControlsView( { el: $( '#controls' ) } );
-						
+			
+			$( '#ctl_a' ).click( function() {
+				// alert( 'aaa' );
+				oFoo.a.trigger( 'bar' );
+				return false;
+			} );
+			
 		} );
 		
 	</script>
@@ -83,6 +109,10 @@
 	<a href="#" id="ctl_8">Bacon</a>
 	
 </div>
+
+<hr />
+
+<a href="#" id="ctl_a">Trigger Foo</a>
 
 </body>
 

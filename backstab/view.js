@@ -19,6 +19,7 @@
 		//// properties
 		
 		_props: null,
+		_maxLevels: 3,					// maximum number of descendant levels to traverse
 		_backboneExtend: null,			// reference to the orginal Backbone.View.extend() method
 		
 		
@@ -29,6 +30,11 @@
 		//
 		setProps: function( props ) {
 			this._props = props;
+			return this;
+		},
+		
+		setMaxLevels: function( maxLevels ) {
+			this._maxLevels = parseInt( maxLevels );
 			return this;
 		},
 		
@@ -149,50 +155,18 @@
 			
 		},
 		
-		
+				
 		// bind delegate events to the view object
 		bindDelegates: function( view ) {
 			
+			//
 			var props = this._props;
 			
 			if ( 'array' !== $.type( props ) ) {
-				
-				props = [];
-				var seen = [];
-				
-				var getProps = function( obj, path, level ) {
-					
-					if ( level > 0 ) return;
-					
-					$.each( obj, function( name, val ) {
-						
-						if ( _.contains( [ 'el', '$el', 'options', '_byId' ], name ) ) return;
-						
-						if ( val && val.on && ( 'function' === $.type( val.on ) ) ) {
-							props.push( path + name );
-						}
-						if (
-							( 'object' === $.type( val ) ) && 
-							( seen.indexOf( val ) == -1 )
-						) {
-							seen.push( val );
-							getProps( val, path + name + '.', level + 1 );
-							// _.showMe( val, path + name + '.', level + 1 );
-						}
-					} );
-				};
-				
-				getProps( view, '', 0 );
-				
-				// _.showMe( props );
+				props = _.descendantsWithMethod( view, 'on', this._maxLevels );
 			}
 			
-			var hasEach = [];
-			$.each( view, function( name, val ) {
-				if ( val.each && ( 'function' == $.type( val.each ) ) ) {
-					hasEach.push( name );
-				}
-			} );
+			var hasEach = _.descendantsWithMethod( view, 'each', this._maxLevels );
 			
 			var delegate = {};
 			
@@ -264,13 +238,18 @@
 				}
 			} );
 			
-			// _.showMe( delegate );
+			// _.showMe( delegate, props );
 			
 			$.each( props, function( i, prop ) {
-				if ( view[ prop ] && view[ prop ].on ) {
+				
+				var propObj = _.descendant( view, prop );
+				
+				if ( propObj && propObj.on ) {
+					
+					// alert( prop );
 					
 					// delegate to master element (default), or sub-elements
-					view[ prop ].on( 'all', function() {
+					propObj.on( 'all', function() {
 						
 						var args = $.makeArray( arguments );
 						var evt = args.shift();
@@ -287,7 +266,7 @@
 					
 					// trigger now
 					if ( _.contains( hasEach, prop ) ) {
-						view[ prop ].each( function() {
+						propObj.each( function() {
 							var args2 = $.makeArray( arguments );
 							var evt = 'initialize';
 							var sel = getDelegateSelector( prop, evt );

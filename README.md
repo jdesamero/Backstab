@@ -415,6 +415,10 @@ The following functions are added:
 
 - ``_.beginsWith( haystack, needle )``. _&lt;content to come&gt;_
 - ``_.expandCurlyShortform( expression )``. _&lt;content to come&gt;_
+- ``_.descendant( object, path )``. _&lt;content to come&gt;_
+- ``_.objectType( object )``. _&lt;content to come&gt;_
+- ``_.descendantsWithMethod( subject, method, maxLevels )``. _&lt;content to come&gt;_
+- ``_.stringify( arg1, arg2, ... argN )``. _&lt;content to come&gt;_
 - ``_.showMe( val )``. _&lt;content to come&gt;_
 
 The following functions are overloaded, original functionality should not be affected:

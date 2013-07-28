@@ -16,6 +16,8 @@
 	
 	var funclist = {
 		
+		//// additions
+		
 		beginsWith: {
 			func: function( haystack, needle ) {
 				
@@ -82,20 +84,108 @@
 			}
 		},
 		
-		showMe: {
-			func: function() {
+		// var obj = { some: { sub: { prop: 'foo' } } };
+		// _.descendant( obj, 'some.sub.prop' );		// returns 'foo'
+		// _.descendant( obj, '' );						// returns obj
+		
+		descendant: {
+			func: function( obj, sPath ) {
+				
+				sPath = $.trim( sPath );
+				if ( !sPath ) return obj;
+				
+				var aPath = sPath.split( '.' );
+				var bFail = false;
+				$.each( aPath, function( i, prop ) {
+					if ( ( 'object' === $.type( obj ) ) && obj[ prop ] ) {
+						obj = obj[ prop ];
+					} else {
+						bFail = true;
+						return false;
+					}
+				} );
+				
+				return ( bFail ) ? false : obj ;
+			}
+		},
+		
+		objectType: {
+			func: function( val ) {
+				if ( 'object' === $.type( val ) ) {
+					var ret = Object.prototype.toString.call( val );
+					return ret.replace( '[object ', '' ).replace( ']', '' );
+				}
+				return false;
+			}
+		},
+		
+		// get the keys of descendants that has the given method name
+		// format is "prop.sub1.sub2.etc..." and traversal is determined by maxLevels
+		
+		descendantsWithMethod: {
+			func: function( subject, method, maxLevels ) {
+				
+				var match = [];
+				var seen = [];
+				
+				var getMatches = function( obj, path, level ) {
+					
+					if ( maxLevels && ( level >= maxLevels ) ) return;
+					
+					$.each( obj, function( name, val ) {
+						
+						// if ( _.contains( [ 'el', '$el', 'options', '_byId' ], name ) ) return;
+						// if ( _.contains( [ 'el' ], name ) ) return;
+						
+						if ( val && val[ method ] && ( 'function' === $.type( val[ method ] ) ) ) {
+							match.push( path + name );
+							// console.log( _.stringify( method, level, path + name ) );
+						}
+						
+						if (
+							( 'Object' === _.objectType( val ) ) && 
+							( seen.indexOf( val ) == -1 )
+						) {
+							// console.log( name + ' -> ' + Object.prototype.toString.call( val ) );
+							seen.push( val );
+							getMatches( val, path + name + '.', level + 1 );
+							// console.log( _.stringify( method, level + 1, path + name + '.', val ) );
+						}
+					} );
+				};
+				
+				getMatches( subject, '', 0 );
+				
+				return match;
+			}
+		},
+		
+		stringify: {
+			func: function() {				
+				
 				var args = $.makeArray( arguments );
 				var obj = ( args.length > 1 ) ? args : args[ 0 ] ;
 				var seen = [];
-				alert( JSON.stringify( obj, function( key, val ) {
+				
+				return JSON.stringify( obj, function( key, val ) {
 					if ( typeof val == 'object' ) {
-						if ( seen.indexOf( val ) >= 0 ) return;
+						var idx = seen.indexOf( val );
+						if ( idx >= 0 ) return '[Cyclic Object #' + idx + ']';
 						seen.push( val );
 					}
 					return val;
-				} ) );
+				} );
 			}
 		},
+		
+		showMe: {
+			func: function() {
+				var args = $.makeArray( arguments );
+				alert( _.stringify.apply( this, args ) );
+			}
+		},
+		
+		//// overrides
 		
 		containsOrig: {
 			init: function() {
