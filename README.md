@@ -238,6 +238,50 @@ var SliderState = Backstab.StateMachine.extend( {
 	]
 } );
 
+```
+
+In the example above, the slider instance will trigger the following [events](https://github.com/jakesgordon/javascript-state-machine#callbacks).
+
+- _before:&lt;someevent&gt;_
+- _leave:&lt;somestate&gt;_
+- _enter:&lt;somestate&gt;_
+- _after:&lt;someevent&gt;_
+- _error:&lt;someevent&gt;_ (additional event triggered when attempting an invalid state transition)
+
+The event handler function will be provided an additional state object which contains all the pertinent 
+information about the event or change in state.
+
+```javascript
+
+state.on( 'before:someevent', function( e, st ) {
+	// 	st = {
+	// 		event: 'someevent',
+	// 		fromstate: 'somestate',
+	// 		tostate: 'otherstate',
+	// 		trigger: [ 'before' | 'leave' | 'enter' | 'after' ]
+	// 	};
+} );
+
+// the 'error' event has additional details
+state.on( 'error:someevent', function( e, st ) {
+	// 	st = {
+	// 		// same details as above, plus:
+	//		error: {
+	//			// comes from the default error handler
+	//			args: errorArgs,
+	//			code: errorCode,
+	//			message: errorMessage
+	//		}
+	// 	};
+} );
+
+```
+
+The following example shows how an instance of `SliderState()` can be used in the context of a Backbone.js 
+application.
+
+```javascript
+
 var goSliderState = new SliderState();
 
 

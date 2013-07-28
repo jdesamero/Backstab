@@ -40,12 +40,15 @@
 						event: event,
 						fromstate: fromstate,
 						tostate: tostate,
-						trigger: trigger
+						trigger: trigger,
+						error: {
+							args: errorArgs,
+							code: errorCode,
+							message: errorMessage
+						}
 					};
-					
-					var args = [ state, errorArgs, errorCode, errorMessage ];
-					
-					this.fire( state, 'event', args );
+										
+					this.fire( state, 'event', [ state ] );
 					
 					return false;
 				}
