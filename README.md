@@ -421,7 +421,7 @@ Backstab.View.latchToBackbone();
 
 ```
 
-The `createConstructor()` method offers and easy way to define a Backbone.js-style constructor.
+The `createConstructor()` method offers an easy way to define a Backbone.js-style constructor.
 
 ```javascript
 
