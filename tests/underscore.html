@@ -22,64 +22,110 @@
 
 <script type="text/javascript">
 
-var expected = function( actualRes, expectedRes, msg ) {
+var expected = function( actualRes, params, msg ) {
 	
 	var suffix = '';
+	var expectedRes = params._exp;
 	var actualResStr = _.stringify( actualRes );
 	var expectedResStr = _.stringify( expectedRes );
+	
+	params._act = actualRes;
 	
 	if ( actualRes === expectedRes ) {
 		suffix = ' (result: ' + actualResStr + ')';	
 	}
 	
-	msg = msg.replace( '##actual##', actualResStr ).replace( '##expected##', expectedResStr );
+	$.each( params, function( k, v ) {
+		msg = msg.replace( '{{' + k + '}}', _.stringify( v ) );
+	} );
 	
 	equal( actualRes, expectedRes, msg + suffix );
 };
 
 test( "_.beginsWith()", function() {
-		
+	
+	var vals1 = {
+		_exp: true,
+		haystack: 'The quick brown fox...',
+		needle: 'The'
+	};
 	expected(
-		_.beginsWith( 'The quick brown fox...', 'The' ), true,
-		'"The quick brown fox..." begins with "The"'
+		_.beginsWith( vals1.haystack, vals1.needle ), vals1,
+		'{{haystack}} begins with "{{needle}}"'
 	);
 	
+	var vals2 = {
+		_exp: false,
+		haystack: 'quick brown fox...',
+		needle: 'The'
+	};	
 	expected(
-		_.beginsWith( 'quick brown fox...', 'The' ), false,
-		'"quick brown fox..." does not begin with "The"'
+		_.beginsWith( vals2.haystack, vals2.needle ), vals2,
+		'{{haystack}} does not begin with "{{needle}}"'
 	);
 	
+	var vals3 = {
+		_exp: 'brown',
+		haystack: 'brown fox quick...',
+		needle: [ 'quick', 'brown', 'fox' ]
+	};
 	expected(
-		_.beginsWith( 'brown fox quick...', [ 'quick', 'brown', 'fox' ] ), 'brown',
-		'"brown fox quick..." begins with "quick", "brown", or "fox"'
+		_.beginsWith( vals3.haystack, vals3.needle ), vals3,
+		'{{haystack}} begins with "quick", "brown", or "fox"'
 	);
 	
+	var vals4 = {
+		_exp: false,
+		haystack: 'black fox quick...',
+		needle: [ 'quick', 'brown', 'fox' ]
+	};
 	expected(
-		_.beginsWith( 'black fox quick...', [ 'quick', 'brown', 'fox' ] ), false,
-		'"black fox quick..." does not begin with "quick", "brown", or "fox"'
+		_.beginsWith( vals4.haystack, vals4.needle ), vals4,
+		'{{haystack}} does not begin with "quick", "brown", or "fox"'
 	);
 	
 } );
 
 test( "_.expandCurlyShortform()", function() {
-	
+
+	var vals1 = { _exp: 'click a' };
 	expected(
-		_.expandCurlyShortform( 'click a' ), 'click a',
-		'Value (##actual##) should not change.'
+		_.expandCurlyShortform( vals1._exp ), vals1,
+		'Value {{_act}} should not change.'
 	);
 	
+	var vals2 = { _exp: 'click #a, #b, #c' };
 	expected(
-		_.expandCurlyShortform( 'click #a, #b, #c' ), 'click #a, #b, #c',
-		'Value (##actual##) should not change.'
+		_.expandCurlyShortform( vals2._exp ), vals2,
+		'Value {{_act}} should not change.'
+	);
+
+	var vals3 = {
+		_exp: 'foo:bar; foo:baz',
+		arg: 'foo:{ bar; baz }'
+	};
+	expected(
+		_.expandCurlyShortform( vals3.arg ), vals3,
+		'Value {{arg}} should change to {{_exp}}.'
 	);
 	
-	var val1 = 'foo:{ bar; baz }';
+	var vals4 = {
+		_exp: 'foo:bar; foo:baz; foo:',
+		arg: 'foo:{ bar; baz; }'
+	};
 	expected(
-		_.expandCurlyShortform( 'foo:{ bar; baz }' ), 'foo:bar; foo:baz',
-		'Value (##actual##) should change to (##expected##).'
+		_.expandCurlyShortform( vals4.arg ), vals4,
+		'Value {{arg}} should change to {{_exp}}.'
 	);
 	
-	ok( 'foo:bar; foo:baz; foo:' === _.expandCurlyShortform( 'foo:{ bar; baz; }' ), 'Passed!' );
+	var vals5 = {
+		_exp: 'foo:bar div > a; foo:baz div > a; fruit:type:apple div .one, .two; fruit:type:pear p .one, .two; fruit:type:grape .one, .two',
+		arg: 'foo:{ bar; baz } div > a; fruit:type:{ apple div; pear p; grape } .one, .two'
+	};
+	expected(
+		_.expandCurlyShortform( vals5.arg ), vals5,
+		'Value {{arg}} should change to {{_exp}}.'
+	);
 	
 } );
 
