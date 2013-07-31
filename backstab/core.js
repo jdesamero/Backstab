@@ -76,39 +76,46 @@
 	};
 	
 	// Backstab constructor template
-	Backstab.createConstructor = function( namespc, opts ) {
+	Backstab.createConstructor = function( namespc, opts, staticProps, cons ) {
 		
 		//
-		var cons = function() {
+		if ( !cons ) {
 			
-			if ( this.setup ) {
-				this.setup.apply( this, arguments );
-			}
-
-			if ( this.initialize ) {
-				this.initialize.apply( this, arguments );
-			}
-
-			if ( this.afterInit ) {
-				this.afterInit.apply( this, arguments );
-			}
-		};
-		
-		//
-		_.extend( cons.prototype, Backstab.Events, opts );
-		
-		cons._namespace = namespc;
-		
-		cons.extend = Backstab.extend;
-		
-		cons.latchToBackbone = function() {
-			Backbone[ cons._namespace ] = this;
-			return this;
-		};
-		
+			cons = function() {
+				
+				if ( this.setup ) {
+					this.setup.apply( this, arguments );
+				}
+	
+				if ( this.initialize ) {
+					this.initialize.apply( this, arguments );
+				}
+	
+				if ( this.afterInit ) {
+					this.afterInit.apply( this, arguments );
+				}
+			};
+			
+			//
+			_.extend( cons.prototype, Backstab.Events, opts );
+			
+			cons._namespace = namespc;
+			
+			cons.extend = Backstab.extend;
+			
+			cons.latchToBackbone = function() {
+				Backbone[ namespc ] = this;
+				return this;
+			};
+		}
+				
 		// latch to Backstab namespace
-		Backstab[ cons._namespace ] = cons;
+		Backstab[ namespc ] = cons;
 		// alert( 'created constructor: ' + cons._namespace );
+		
+		if ( staticProps ) {
+			_.extend( Backstab[ namespc ], staticProps );
+		}
 		
 		return cons;
 	};

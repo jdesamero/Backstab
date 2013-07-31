@@ -14,7 +14,7 @@
 	var Backstab = this.Backstab;
 	
 	//
-	Backstab.View = {
+	Backstab.createConstructor( 'View', {}, {
 		
 		//// properties
 		
@@ -152,7 +152,6 @@
 			}
 			
 			return obj;
-			
 		},
 		
 				
@@ -282,7 +281,6 @@
 			
 		},
 		
-		
 		// wrapper for Backbone.View.extend() which applies enhancements to events
 		extend: function() {
 			var args = $.makeArray( arguments );
@@ -291,93 +289,94 @@
 			}
 			return Backbone.View.extend.apply( Backbone.View, args );
 		}
-			
-	};
-	
+		
+	} );
 	
 	/* ------------------------------------------------------------------------------------------ */
 	
 	// model bindings
 	
-	//
-	Backbone.View.prototype._unloadFromModel = function( model, elem ) {
+	_.extend( Backbone.View.prototype, {
 		
-		if ( !model ) model = this.model;
-		if ( !elem ) elem = this.$el;
-		
-		if ( model && elem ) {
-			var data = model.toJSON();
-			$.each( data, function( prop, val ) {
-				
-				// try these selectors
-				var sels = [ '.' + prop, '#' + prop ];
-				
-				$.each( sels, function( i, sel ) {
-					var target = elem.find( sel );
-					if ( target.length > 0 ) {
-						var tag = target.prop( 'tagName' ).toLowerCase();
-						if ( 'input' == tag ) {
-							target.val( val );
-						} else {
-							target.html( val );						
+		//
+		_unloadFromModel: function( model, elem ) {
+			
+			if ( !model ) model = this.model;
+			if ( !elem ) elem = this.$el;
+			
+			if ( model && elem ) {
+				var data = model.toJSON();
+				$.each( data, function( prop, val ) {
+					
+					// try these selectors
+					var sels = [ '.' + prop, '#' + prop ];
+					
+					$.each( sels, function( i, sel ) {
+						var target = elem.find( sel );
+						if ( target.length > 0 ) {
+							var tag = target.prop( 'tagName' ).toLowerCase();
+							if ( 'input' == tag ) {
+								target.val( val );
+							} else {
+								target.html( val );						
+							}
+							return false;
 						}
-						return false;
-					}
+					} );
+					
 				} );
-				
-			} );
-		}
+			}
+			
+		},
 		
-	};
-	
-	//
-	Backbone.View.prototype._unloadFromView = function( model, elem ) {
-		
-		var ret = {};
-		
-		if ( !model ) model = this.model;
-		if ( !elem ) elem = this.$el;
-		
-		if ( model && elem ) {
-			var data = model.toJSON();
-			$.each( data, function( prop, oldval ) {
-				
-				var newval = null;
-				
-				// try these selectors
-				var sels = [ '.' + prop, '#' + prop ];
-				
-				$.each( sels, function( i, sel ) {
-					var target = elem.find( sel );
-					if ( target.length > 0 ) {
-						var tag = target.prop( 'tagName' ).toLowerCase();
-						if ( 'input' == tag ) {
-							newval = target.val();
-						} else {
-							newval = target.html();						
+		_unloadFromView: function( model, elem ) {
+			
+			var ret = {};
+			
+			if ( !model ) model = this.model;
+			if ( !elem ) elem = this.$el;
+			
+			if ( model && elem ) {
+				var data = model.toJSON();
+				$.each( data, function( prop, oldval ) {
+					
+					var newval = null;
+					
+					// try these selectors
+					var sels = [ '.' + prop, '#' + prop ];
+					
+					$.each( sels, function( i, sel ) {
+						var target = elem.find( sel );
+						if ( target.length > 0 ) {
+							var tag = target.prop( 'tagName' ).toLowerCase();
+							if ( 'input' == tag ) {
+								newval = target.val();
+							} else {
+								newval = target.html();						
+							}
+							ret[ prop ] = newval;
+							return false;
 						}
-						ret[ prop ] = newval;
-						return false;
-					}
-				} );
-				
-			} );	
+					} );
+					
+				} );	
+			}
+			
+			// _.showMe( ret );
+			
+			return ret;
+		},
+		
+		_loadToModel: function( model, elem ) {
+			
+			if ( !model ) model = this.model;
+			if ( !elem ) elem = this.$el;
+			
+			if ( model && elem ) {
+				model.set( this._unloadFromView( model, elem ) );
+			}
 		}
 		
-		// _.showMe( ret );
-		
-		return ret;
-	};
-	
-	//
-	Backbone.View.prototype._loadToModel = function( model, elem ) {
-		
-		if ( !model ) model = this.model;
-		if ( !elem ) elem = this.$el;
-		
-		if ( model && elem ) {
-			model.set( this._unloadFromView( model, elem ) );
-		}
-	};
+	} );
 	
 } ).call( this );
