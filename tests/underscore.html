@@ -5,7 +5,8 @@
     <meta charset="UTF-8" />
     <title>QUnit - backstab/underscore.js</title>
 	<link href="http://code.jquery.com/qunit/qunit-1.12.0.css" rel="stylesheet" type="text/css" />
-
+	<link href="../css/style.css" rel="stylesheet" type="text/css" />
+	
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js" type="text/javascript"></script>
 	<script src="http://documentcloud.github.com/underscore/underscore-min.js" type="text/javascript"></script>
 	<script src="http://documentcloud.github.com/backbone/backbone-min.js" type="text/javascript"></script>
@@ -16,31 +17,14 @@
 
 <body>
 
+<p><a href="index.html">Main Menu</a></p>
+
 <div id="qunit"></div>
 <div id="qunit-fixture"></div>
 <script src="http://code.jquery.com/qunit/qunit-1.12.0.js" type="text/javascript"></script>
+<script src="funcs.js" type="text/javascript"></script>
 
 <script type="text/javascript">
-
-var expected = function( actualRes, params, msg ) {
-	
-	var suffix = '';
-	var expectedRes = params._exp;
-	var actualResStr = _.stringify( actualRes );
-	var expectedResStr = _.stringify( expectedRes );
-	
-	params._act = actualRes;
-	
-	if ( actualRes === expectedRes ) {
-		suffix = ' (result: ' + actualResStr + ')';	
-	}
-	
-	$.each( params, function( k, v ) {
-		msg = msg.replace( '{{' + k + '}}', _.stringify( v ) );
-	} );
-	
-	equal( actualRes, expectedRes, msg + suffix );
-};
 
 test( "_.beginsWith()", function() {
 	
@@ -125,6 +109,76 @@ test( "_.expandCurlyShortform()", function() {
 	expected(
 		_.expandCurlyShortform( vals5.arg ), vals5,
 		'Value {{arg}} should change to {{_exp}}.'
+	);
+	
+} );
+
+test( "_.descendant()", function() {
+	
+	var oTest = {
+		name: 'John Doe',
+		color: {
+			red: 'Apple',
+			blue: 'Sky',
+			green: 'Leaf'
+		},
+		address: {
+			shipping: {
+				street: '25 Avenue Road',
+				city: 'Toronto',
+				postal: 'M6K 9H6'
+			},
+			billing: {
+				street: '4031 Rue Megantic',
+				city: 'Montreal',
+				postal: 'J7B 3R4'			
+			}
+		}
+	};
+	
+	var res1 = _.descendant( oTest );
+	var vals1 = { _exp: 'John Doe' };
+	expected(
+		res1.name, vals1,
+		'res1.name should be {{_exp}}.'
+	);
+	
+	var vals2 = { _exp: 'John Doe', arg: 'name' };
+	expected(
+		_.descendant( oTest, vals2.arg ), vals2,
+		'_.descendant( oTest, {{arg}} ) should be {{_exp}}.'
+	);
+	
+	var vals3 = { _exp: 'Sky', arg: 'color.blue' };
+	expected(
+		_.descendant( oTest, vals3.arg ), vals3,
+		'_.descendant( oTest, {{arg}} ) should be {{_exp}}.'
+	);
+	
+	var vals4 = { _exp: 'M6K 9H6', arg: 'address.shipping.postal' };
+	expected(
+		_.descendant( oTest, vals4.arg ), vals4,
+		'_.descendant( oTest, {{arg}} ) should be {{_exp}}.'
+	);
+	
+	var res5 = _.descendant( oTest, 'color' );
+	var vals5 = { _exp: 'Leaf' };
+	expected(
+		res5.green, vals5,
+		'res5.green should be {{_exp}}.'
+	);
+	
+	var res6 = _.descendant( oTest, 'address.billing' );
+	var vals6 = { _exp: '4031 Rue Megantic' };
+	expected(
+		res6.street, vals6,
+		'res6.street should be {{_exp}}.'
+	);
+	
+	var vals7 = { _exp: false, arg: 'some.bogus.path' };
+	expected(
+		_.descendant( oTest, vals7.arg ), vals7,
+		'_.descendant( oTest, {{arg}} ) should be {{_exp}}.'
 	);
 	
 } );

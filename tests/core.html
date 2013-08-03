@@ -1,0 +1,145 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    
+    <meta charset="UTF-8" />
+    <title>QUnit - backstab/core.js</title>
+	<link href="http://code.jquery.com/qunit/qunit-1.12.0.css" rel="stylesheet" type="text/css" />
+	<link href="../css/style.css" rel="stylesheet" type="text/css" />
+	
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js" type="text/javascript"></script>
+	<script src="http://documentcloud.github.com/underscore/underscore-min.js" type="text/javascript"></script>
+	<script src="http://documentcloud.github.com/backbone/backbone-min.js" type="text/javascript"></script>
+	
+	<script src="../backstab/underscore.js" type="text/javascript"></script>
+	<script src="../backstab/core.js" type="text/javascript"></script>
+	
+</head>
+
+<body>
+
+<p><a href="index.html">Main Menu</a></p>
+
+<div id="qunit"></div>
+<div id="qunit-fixture"></div>
+<script src="http://code.jquery.com/qunit/qunit-1.12.0.js" type="text/javascript"></script>
+<script src="funcs.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+
+Backstab.createConstructor( 'QUnit', {
+	
+	setup: function( opts ) {
+		this.title = opts.title;
+	},
+	
+	getFooValue: function( msg ) {
+		return 'Foo Value' + msg;
+	}
+	
+} );
+
+var oQUnit = new Backstab.QUnit( {
+	title: 'Instance Title'
+} );
+
+var QClass = Backstab.QUnit.extend( {
+	
+	initialize: function( opts ) {
+		this.name = opts.name;
+	}
+	
+} );
+
+var oQObj = new QClass( {
+	title: 'Object Title',
+	name: 'Object Name'
+} );
+
+Backstab.latchToBackbone( 'QUnit' );
+
+var oQBack = new Backbone.QUnit( {
+	title: 'QBack Title'
+} );
+
+/* ---------------------------------------------------------------------------------------------- */
+
+test( "Backstab.createConstructor()", function() {
+		
+	var vals1 = { _exp: 'function' };
+	expected(
+		$.type( Backstab.QUnit ), vals1,
+		'Backstab.QUnit is a {{_exp}}'
+	);
+	
+	var vals2 = { _exp: 'object' };
+	expected(
+		$.type( oQUnit ), vals2,
+		'oQUnit is an {{_exp}}'
+	);
+	
+	var vals3 = { _exp: 'Foo Value!' };
+	expected(
+		oQUnit.getFooValue( '!' ), vals3,
+		'oQUnit.getFooValue( \'!\' ) should be {{_exp}}'
+	);
+	
+	var vals4 = { _exp: 'Instance Title' };
+	expected(
+		oQUnit.title, vals4,
+		'oQUnit.title value should be {{_exp}}'
+	);
+	
+	var vals5 = { _exp: 'function' };
+	expected(
+		$.type( QClass ), vals5,
+		'QClass is a {{_exp}}'
+	);
+	
+	var vals6 = { _exp: 'object' };
+	expected(
+		$.type( oQObj ), vals6,
+		'oQObj is an {{_exp}}'
+	);
+	
+	var vals7 = { _exp: 'Object Title' };
+	expected(
+		oQObj.title, vals7,
+		'oQObj.title should be {{_exp}}'
+	);
+
+	var vals8 = { _exp: 'Object Name' };
+	expected(
+		oQObj.name, vals8,
+		'oQObj.name should be {{_exp}}'
+	);
+		
+} );
+
+test( "Backstab.latchToBackbone()", function() {
+	
+	var vals1 = { _exp: 'function' };
+	expected(
+		$.type( Backbone.QUnit ), vals1,
+		'Backbone.QUnit is a {{_exp}}'
+	);
+
+	var vals2 = { _exp: 'object' };
+	expected(
+		$.type( oQBack ), vals2,
+		'oQBack is an {{_exp}}'
+	);
+
+	var vals3 = { _exp: 'QBack Title' };
+	expected(
+		oQBack.title, vals3,
+		'oQBack.title value should be {{_exp}}'
+	);
+	
+} );
+
+</script>
+
+</body>
+
+</html>
