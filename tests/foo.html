@@ -29,8 +29,53 @@
 
 <script type="text/javascript">
 
+var Foo = Backstab.Foo.extend( {
+
+} );
+
+var oFoo = new Foo( {
+	foo: 'Clowns',
+	baz: 'Elephants',
+	quux: 'Don Quixote'
+} );
+
+var sBazArg = 'are big';
+
 test( "Backstab.Foo", function() {
 	
+	expect( 4 );
+	
+	// call trigger
+	oFoo.on( 'baz', function( foo, msg ) {
+
+		var vals1 = { _exp: oFoo.options.quux };
+		expected(
+			oFoo.options.quux, vals1,
+			'oFoo.options.quux should be {{_exp}}'
+		);
+
+		var vals2 = { _exp: sBazArg };
+		expected(
+			msg, vals2,
+			'msg should be {{_exp}}'
+		);
+		
+	} );
+	
+	var vals1 = { _exp: oFoo.options.foo };
+	expected(
+		oFoo.options.foo, vals1,
+		'oFoo.options.foo should be {{_exp}}'
+	);
+	
+	var vals2 = {
+		_exp: 'Calling baz: ' + oFoo.options.baz + ' ' + sBazArg,
+		arg: sBazArg
+	};
+	expected(
+		oFoo.baz( vals2.arg ), vals2,
+		'oFoo.baz( {{arg}} ) should be {{_exp}}'
+	);
 	
 	
 } );
