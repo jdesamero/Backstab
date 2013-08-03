@@ -71,12 +71,13 @@ var Album = Backbone.Collection.extend( {
 
 //// views
 
+var iColInitCount = 0;
+
 // list
 var ListView = Backstab.View.extend( {
 	
 	events: {
-		'collection:initialize; collection:add': 'addSong',
-		'dispatcher:deleteSong': 'deleteSong'
+		'collection:initialize; collection:add': 'addSong'
 	},
 	
 	tagName: 'ul',
@@ -84,6 +85,9 @@ var ListView = Backstab.View.extend( {
 	_items: [],
 	
 	addSong: function( e, song ) {
+		
+		if ( 'collection:initialize' == e.type ) iColInitCount++;
+		
 		var item = new ItemView( { model: song } );
 		this._items.push( item );
 		this.$el.append( item.render().$el );
@@ -106,8 +110,6 @@ var ListView = Backstab.View.extend( {
 var ItemView = Backstab.View.extend( {
 	
 	events: {
-		'click .edit': 'editItem',
-		'click .del': 'deleteItem',
 		'model:change': 'updateSong'
 	},
 	
@@ -122,19 +124,8 @@ var ItemView = Backstab.View.extend( {
 	render: function() {
 		this.updateSong();
 		return this;
-	},
-	
-	editItem: function() {
-		this.dispatcher.trigger( 'editSong', this.model );
-		return false;			
-	},
-	
-	deleteItem: function() {
-		this.dispatcher.trigger( 'deleteSong', this.model, this );
-		this.remove();
-		return false;			
 	}
-	
+		
 } );
 
 var sNameTest = 'How Bizarre';
@@ -157,41 +148,54 @@ var songlist = new ListView( {
 	el: $( '#songlist' )
 } );
 
+var eSongList = $( '#songlist' );
+
 /* ---------------------------------------------------------------------------------------------- */
 
-test( "Backstab.View.extend()", function() {
-	
-	var eSongList = $( '#songlist' );
+test( 'Backstab.View, Setup', function() {
 	
 	var vals1 = { _exp: sNameTest };
 	expected(
 		eSongList.find( 'span.name' ).eq( 0 ).html(), vals1,
 		'First song name should be {{_exp}}'
 	);
+
+	var vals2 = { _exp: songs.length };
+	expected(
+		iColInitCount, vals2,
+		'collection:initialize should have been called {{_exp}} times'
+	);
+	
+} );
+
+test( 'Backstab.View, Model Events', function() {
 	
 	// change song name
 	var sChangeName = 'On the Run';
 	song1.set( 'name', sChangeName );
 	
-	var vals2 = { _exp: sChangeName };
+	var vals1 = { _exp: sChangeName };
 	expected(
-		eSongList.find( 'span.name' ).eq( 0 ).html(), vals2,
+		eSongList.find( 'span.name' ).eq( 0 ).html(), vals1,
 		'First song name should now be {{_exp}}'
 	);
+	
+} );
+
+test( 'Backstab.View, Collection Events', function() {
 	
 	// add new song
 	var sNewName = 'Mr. Roboto';
 	var oNewSong = new Song( { name: sNewName, artist: 'Styx', duration: '3:10' } );
 	myAlbum.add( oNewSong );
 	
-	var vals3 = { _exp: sNewName };
+	var vals1 = { _exp: sNewName };
 	expected(
-		eSongList.find( 'span.name' ).eq( 4 ).html(), vals3,
+		eSongList.find( 'span.name' ).eq( 4 ).html(), vals1,
 		'Fifth song name should be {{_exp}}'
 	);
 	
 } );
-
 
 </script>
 
