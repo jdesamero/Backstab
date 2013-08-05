@@ -29,7 +29,7 @@
 <div id="qunit-fixture"></div>
 
 <style type="text/css">
-	#songlist {
+	#songlist, #foo {
 		display: none;
 	}
 </style>
@@ -45,12 +45,23 @@
 		</li>
 	</script>
 </ul>
+<div id="foo">
+	<div class="foods">
+		<a href="#" id="apple" class="fruit">Apple</a>
+		<a href="#" id="banana" class="fruit">Banana</a>
+		<a href="#" id="broccoli" class="vegetable">Broccoli</a>
+		<a href="#" id="cabbage" class="vegetable">Cabbage</a>
+		<a href="#" id="bacon" class="meat">Bacon</a>
+		<a href="#" id="steak" class="meat">Steak</a>
+	</div>
+</div>
 
 <script src="http://code.jquery.com/qunit/qunit-1.12.0.js" type="text/javascript"></script>
 <script src="funcs.js" type="text/javascript"></script>
 
 <script type="text/javascript">
 
+//// setup
 
 // song
 var Song = Backbone.Model.extend( {
@@ -61,15 +72,25 @@ var Song = Backbone.Model.extend( {
 	}
 } );
 
-//// collections
+// collections
 
 // album
 var Album = Backbone.Collection.extend( {
 	model: Song
 } );
 
+var Foo = Backstab.Foo.extend( {
+	
+	dip: function( testCb, msg ) {
+		this.trigger( 'dip', this, testCb, msg );
+		return 'Calling dip: ' + msg;
+	}
+	
+} );
 
-//// views
+
+
+// views
 
 var iColInitCount = 0;
 
@@ -125,8 +146,74 @@ var ItemView = Backstab.View.extend( {
 		this.updateSong();
 		return this;
 	}
-		
+	
 } );
+
+
+var foo1 = new Foo( { baz: 'fruit' } );
+var foo2 = new Foo( { baz: 'vegetable' } );
+var foo3 = new Foo( { baz: 'meat' } );
+
+
+
+// controls
+var ControlsView = Backstab.View.extend( {
+	
+	_fooCount: 0,
+	_fooMsg: '',
+	
+	events: {
+		
+		// delegate parameters
+		'checkval .fruit': [ 'whatAmI', 'sweet' ],
+		'checkval .vegetable': [ 'whatAmI', 'bitter' ],
+		'checkval .meat': [ 'whatAmI', 'savoury' ],
+		
+		// dot notation
+		'foos.fruit:baz .foods > a': 'foodCheck',
+		
+		// multiple delegates per method
+		'prepare .foods; consume .foods': 'foodAction',
+		
+		// curly brace shorthand
+		'foos.{ fruit:dip; vegetable:dip; meat:dip } .foods > a': 'foodDip'
+		
+	},
+
+	foos: {
+		fruit: foo1,
+		vegetable: foo2,
+		meat: foo3
+	},
+	
+	whatAmI: function( e, testCb, msg ) {
+		testCb( $( e.target ), msg );
+		return false;
+	},
+	
+	// 'baz' trigger signature: e, foo, msg;
+	foodCheck: function( e, foo, msg ) {
+		if ( $( e.target ).hasClass( foo.options.baz ) ) {
+			this._fooCount++;
+			this._fooMsg = msg;
+		}
+		return false;
+	},
+	
+	foodAction: function( e, testCb, msg ) {
+		testCb( $( e.target ), msg );
+		return false;	
+	},
+	
+	foodDip: function( e, foo, testCb, msg ) {
+		testCb( $( e.target ), foo, msg );
+		return false;
+	}
+	
+} );
+
+
+//// invoke
 
 var sNameTest = 'How Bizarre';
 
@@ -140,15 +227,20 @@ var songs = [ song1, song2, song3, song4 ];
 var myAlbum = new Album( songs );
 // console.log( myAlbum.models );
 
-
-//// views
+// views
 
 var songlist = new ListView( {
 	collection: myAlbum,
 	el: $( '#songlist' )
 } );
 
-var eSongList = $( '#songlist' );
+var eSngl = songlist.$el;
+
+var controls = new ControlsView( {
+	el: $( '#foo' )
+} );
+
+var eCtl = controls.$el;
 
 /* ---------------------------------------------------------------------------------------------- */
 
@@ -156,7 +248,7 @@ test( 'Backstab.View, Setup', function() {
 	
 	var vals1 = { _exp: sNameTest };
 	expected(
-		eSongList.find( 'span.name' ).eq( 0 ).html(), vals1,
+		eSngl.find( 'span.name' ).eq( 0 ).html(), vals1,
 		'First song name should be {{_exp}}'
 	);
 
@@ -176,7 +268,7 @@ test( 'Backstab.View, Model Events', function() {
 	
 	var vals1 = { _exp: sChangeName };
 	expected(
-		eSongList.find( 'span.name' ).eq( 0 ).html(), vals1,
+		eSngl.find( 'span.name' ).eq( 0 ).html(), vals1,
 		'First song name should now be {{_exp}}'
 	);
 	
@@ -191,9 +283,114 @@ test( 'Backstab.View, Collection Events', function() {
 	
 	var vals1 = { _exp: sNewName };
 	expected(
-		eSongList.find( 'span.name' ).eq( 4 ).html(), vals1,
+		eSngl.find( 'span.name' ).eq( 4 ).html(), vals1,
 		'Fifth song name should be {{_exp}}'
 	);
+	
+} );
+
+module( 'Backstab.View, Enhanced Event Delegation' );
+
+test( 'Delegate Parameters', function() {
+	
+	expect( 3 );
+	
+	eCtl.find( '#apple' ).trigger( 'checkval', function( elem, msg ) {
+		var vals1 = { _exp: 'apple sweet' };
+		expected(
+			elem.attr( 'id' ) + ' ' + msg, vals1,
+			'Result of "checkval #apple" should be {{_exp}}'
+		);
+	} );
+	
+	eCtl.find( '#broccoli' ).trigger( 'checkval', function( elem, msg ) {
+		var vals1 = { _exp: 'broccoli bitter' };
+		expected(
+			elem.attr( 'id' ) + ' ' + msg, vals1,
+			'Result of "checkval #broccoli" should be {{_exp}}'
+		);
+	} );
+	
+	eCtl.find( '#bacon' ).trigger( 'checkval', function( elem, msg ) {
+		var vals1 = { _exp: 'bacon savoury' };
+		expected(
+			elem.attr( 'id' ) + ' ' + msg, vals1,
+			'Result of "checkval #bacon" should be {{_exp}}'
+		);
+	} );
+		
+} );
+
+test( 'Dot Notation', function() {
+	
+	var foo1Msg = 'foo1.baz is Fruits!';
+	foo1.baz( foo1Msg );
+	
+	var vals1 = { _exp: eCtl.find( '.foods > .fruit' ).length };
+	expected(
+		controls._fooCount, vals1,
+		'Number of .fruits and controls._fooCount should be {{_exp}}'
+	);
+
+	var vals2 = { _exp: foo1Msg };
+	expected(
+		controls._fooMsg, vals2,
+		'controls._fooMsg should be {{_exp}}'
+	);
+	
+} );
+
+test( 'Multiple delegates per method', function() {
+	
+	expect( 2 );
+	
+	var vals1 = { msg: 'Prepared Cider' };
+	vals1._exp = 'apple ' + vals1.msg
+	eCtl.find( '#apple' ).trigger( 'prepare', [ function( elem, msg ) {
+		expected(
+			elem.attr( 'id' ) + ' ' + msg, vals1,
+			'Result of "prepare #apple" should be {{_exp}}'
+		);
+	}, vals1.msg ] );
+	
+	var vals2 = { msg: 'Devoured Steak' };
+	vals2._exp = 'steak ' + vals2.msg
+	eCtl.find( '#steak' ).trigger( 'consume', [ function( elem, msg ) {
+		expected(
+			elem.attr( 'id' ) + ' ' + msg, vals2,
+			'Result of "consume #steak" should be {{_exp}}'
+		);
+	}, vals2.msg ] );
+	
+} );
+
+test( 'Curly brace shorthand', function() {
+	
+	expect( 4 );
+	
+	var foo1Msg = 'Caramel!';
+	foo1.dip( function( elem, foo, msg ) {
+		var id = elem.attr( 'id' );
+		if ( elem.hasClass( foo.options.baz ) ) {
+			var vals1 = { _exp: id + ' ' + foo1Msg };
+			expected(
+				id + ' ' + msg, vals1,
+				'foo1.dip msg should be {{_exp}}'
+			);
+		}
+	}, foo1Msg );
+	
+	var foo2Msg = 'Sauce!';
+	foo2.dip( function( elem, foo, msg ) {
+		var id = elem.attr( 'id' );
+		if ( elem.hasClass( foo.options.baz ) ) {
+			var vals1 = { _exp: id + ' ' + foo2Msg };
+			expected(
+				id + ' ' + msg, vals1,
+				'foo2.dip msg should be {{_exp}}'
+			);
+		}
+	}, foo2Msg );
 	
 } );
 
