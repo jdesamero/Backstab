@@ -192,50 +192,52 @@
 			};
 			
 			//
-			$.each( view.events, function( evtsel, method ) {
-				
-				var func = null;
-				
-				if ( 'function' === $.type( method ) ) {
-					func = method;
-				} else if (
-					( 'string' === $.type( method ) ) && 
-					( 'function' === $.type( view[ method ] ) )
-				) {
-					func = view[ method ];
-				}
-				
-				var prop = _.beginsWith( evtsel, props );
-				
-				if ( func && prop ) {
+			if (  view.events ) {
+				$.each( view.events, function( evtsel, method ) {
 					
-					if ( !delegate[ prop ] ) delegate[ prop ] = {};
+					var func = null;
 					
-					var sel = '', part1 = '', part2 = '', pos = null, evt = null, on = false;
-					
-					part1 = prop + ':';
-					part2 = $.trim( evtsel.substring( part1.length ) );
-					pos = part2.indexOf( ' ' );
-					if ( -1 != pos ) {
-						sel = $.trim( part2.substring( pos ) );
-						part2 = $.trim( part2.substring( 0, pos ) );
+					if ( 'function' === $.type( method ) ) {
+						func = method;
+					} else if (
+						( 'string' === $.type( method ) ) && 
+						( 'function' === $.type( view[ method ] ) )
+					) {
+						func = view[ method ];
 					}
 					
-					delegate[ prop ][ part2 ] = sel;
+					var prop = _.beginsWith( evtsel, props );
 					
-					evt = $.trim( part1 + part2 );
-					
-					var target = resolveTarget( view.$el, sel );
-										
-					if ( evt ) {
-						func = _.bind( func, view );
-						var hasEachProp = _.beginsWith( evt, hasEach );
-						if ( hasEachProp && ( ( hasEachProp + ':initialize' ) == evt ) ) {
-							target.on( evt, func );
+					if ( func && prop ) {
+						
+						if ( !delegate[ prop ] ) delegate[ prop ] = {};
+						
+						var sel = '', part1 = '', part2 = '', pos = null, evt = null, on = false;
+						
+						part1 = prop + ':';
+						part2 = $.trim( evtsel.substring( part1.length ) );
+						pos = part2.indexOf( ' ' );
+						if ( -1 != pos ) {
+							sel = $.trim( part2.substring( pos ) );
+							part2 = $.trim( part2.substring( 0, pos ) );
+						}
+						
+						delegate[ prop ][ part2 ] = sel;
+						
+						evt = $.trim( part1 + part2 );
+						
+						var target = resolveTarget( view.$el, sel );
+											
+						if ( evt ) {
+							func = _.bind( func, view );
+							var hasEachProp = _.beginsWith( evt, hasEach );
+							if ( hasEachProp && ( ( hasEachProp + ':initialize' ) == evt ) ) {
+								target.on( evt, func );
+							}
 						}
 					}
-				}
-			} );
+				} );
+			}
 			
 			// _.showMe( delegate, props );
 			
