@@ -12,11 +12,7 @@
 	
 	var getTarget = function( elem, params, prop ) {
 		
-<<<<<<< HEAD
 		var sel = null, fcont = null, target = null, _target = null, defer = null;
-=======
-		var sel = null, fcont = null, target = null, _target = null;
->>>>>>> 47188b30f64d575553d92211472ac7f193786183
 		
 		if ( params && params[ prop ] ) {
 			
@@ -29,13 +25,10 @@
 			if ( propParams.contents ) {
 				fcont = propParams.contents;
 			}
-<<<<<<< HEAD
 
 			if ( propParams.defer ) {
 				defer = propParams.defer;
 			}
-=======
->>>>>>> 47188b30f64d575553d92211472ac7f193786183
 		}
 		
 		// find target
@@ -60,11 +53,7 @@
 			
 		}
 		
-<<<<<<< HEAD
 		return [ _target, fcont, defer ];
-=======
-		return [ _target, fcont ];
->>>>>>> 47188b30f64d575553d92211472ac7f193786183
 	};
 	
 	var Backbone = this.Backbone;
@@ -113,20 +102,6 @@
 		populateElem: function( elem, params ) {
 			
 			var model = this;
-
-			var setTargetValue = function( target, val ) {
-				
-				var tag = target.prop( 'tagName' ).toLowerCase();
-				
-				// TO DO!!!!!!
-				if ( 'input' == tag ) {
-					target.val( val );
-				} else {
-					target.html( val );						
-				}
-			};
-			
-			// -------------------------------------------------------------------------------------
 			
 			var setTargetValue = function( target, val, cb ) {
 				if ( target ) {
@@ -152,7 +127,6 @@
 					var res = getTarget( elem, params, prop );
 					var _target = res[ 0 ];
 					var fcont = res[ 1 ];
-<<<<<<< HEAD
 					var defer = res[ 2 ];
 					
 					if ( defer ) {
@@ -176,13 +150,6 @@
 						
 					} else {
 						setTargetValue( _target, val, fcont );
-=======
-					
-					// populate
-					if ( _target ) {
-						if ( fcont ) fcont( _target, val );
-						else setTargetValue( _target, val );
->>>>>>> 47188b30f64d575553d92211472ac7f193786183
 					}
 					
 				} );
