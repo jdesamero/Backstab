@@ -1,0 +1,323 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    
+    <meta charset="UTF-8" />
+    <title>Backstab - Factory</title>
+	
+	<link href="../css/style.css" type="text/css" rel="stylesheet" media="screen" />
+	
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js" type="text/javascript"></script>
+	<script src="http://documentcloud.github.com/underscore/underscore-min.js" type="text/javascript"></script>
+	<script src="http://documentcloud.github.com/backbone/backbone-min.js" type="text/javascript"></script>
+	
+	<script src="../etc/jquery.tmpl.js" type="text/javascript"></script>
+	
+	<script src="../backstab/underscore.js" type="text/javascript"></script>
+	<script src="../backstab/core.js" type="text/javascript"></script>
+	
+	<script src="../backstab/model.js" type="text/javascript"></script>
+	<script src="../backstab/collection.js" type="text/javascript"></script>
+	<script src="../backstab/view.js" type="text/javascript"></script>
+	<script src="../backstab/dispatcher.js" type="text/javascript"></script>
+	<script src="../backstab/foo.js" type="text/javascript"></script>
+	
+	<script src="../backstab/factory.js" type="text/javascript"></script>
+	
+	
+	<style type="text/css">
+		
+		td, th {
+			padding: 3px 12px;
+		}
+		
+		ul {
+			margin: 0;
+		}
+		
+	</style>
+	
+	<script type="text/javascript">
+		
+		var goColors = null;
+		
+		var Color = Backstab.factory( {
+			
+			name: 'color',
+			
+			itemView: {
+				params: {
+					inittmpl: true,
+					postupdate: function() {
+						this.$( '> .cid' ).html( this.cid );
+					}
+				}
+			}
+			
+		} );
+		
+		var MyColor = Backstab.factory( {
+			
+			name: 'my_color',
+			
+			itemView: {
+				params: {
+					inittmpl: true,
+					postupdate: function() {
+						this.$( '> .cid' ).html( this.cid );
+					}
+				}
+			},
+			
+			listView: {
+				params: {
+					inittmpl: true
+				}
+			}
+			
+		} );
+		
+		var Food = Backstab.factory( {
+			
+			name: 'food',
+			
+			itemView: {
+				params: {
+					
+					inittmpl: true,
+					
+					postupdate: function() {
+						this.$( '> .cid' ).html( this.cid );
+					},
+					
+					populatehash: {
+						colors: {
+							contents: function( elem, val ) {
+								
+								var oColors = new Color.Collection();
+								
+								$.each( val, function( i, colorName ) {
+									var oColor = goColors.findWhere( { name: colorName } );
+									oColors.add( oColor );
+								} );
+								
+								var oMyColorsView = new MyColor.ListView( {
+									collection: oColors
+								} );
+								
+								elem.html( oMyColorsView.render().$el );
+								// $( '.plork' ).append( oMyColorsView.render().$el );
+								
+							}
+						}
+					}
+					
+				}
+			}
+			
+		} );
+		
+		var Foo = Backstab.Model.extend( {} );
+		
+		var FooView = Backbone.View.extend( {
+			
+			events: {
+				'model:change :first': 'updateItem',
+				'model:destroy :first': 'removeEwt'
+			},
+			
+			updateItem: function() {
+				
+				if ( this.model ) {
+					this.model.populateElem( this.$el );
+				}
+								
+			},
+			
+			removeEwt: function( e, model ) {
+				alert( 'destroying mew...' );
+				this.unbind();
+				this.remove();
+			},
+			
+			render: function() {
+				this.updateItem();
+				return this;
+			}
+			
+		} );
+		
+ 		//// execute
+		
+		jQuery( document ).ready( function( $ ) {			
+			
+			var oColors = new Color.Collection();
+			goColors = oColors;
+			
+			var aColors = [
+				{ name: 'Red' },
+				{ name: 'Green' },
+				{ name: 'Brown' },
+				{ name: 'Orange' },
+				{ name: 'Purple' },
+				{ name: 'Yellow' }
+			];
+			
+			$.each( aColors, function( i, v ) {
+				oColors.add( new Color.Model( v ) );
+			} );
+			
+			var oColorsView = new Color.ListView( {
+				el: $( '#colors' ),
+				collection: oColors
+			} );
+			
+			// -------------------------------------------------------------------------------------
+			
+			var oFoods = new Food.Collection();
+			
+			var aFoods = [
+				{ name: 'Apple', colors: [ 'Red', 'Green' ] },
+				{ name: 'Meat', colors: [ 'Red', 'Brown' ] },
+				{ name: 'Eggplant', colors: [ 'Green', 'Purple' ] },
+				{ name: 'Mango', colors: [ 'Green', 'Yellow', 'Red' ] },
+				{ name: 'Grape', colors: [ 'Green', 'Purple' ] }
+			];
+			
+			$.each( aFoods, function( i, v ) {
+				oFoods.add( new Food.Model( v ) );
+			} );
+			
+			var oFoodsView = new Food.ListView( {
+				el: $( '#foods' ),
+				collection: oFoods
+			} );
+			
+			// console.log( oFoodsView );
+			
+			// -------------------------------------------------------------------------------------
+			
+			$( '#setcolor' ).click( function() {
+				var oColor = goColors.findWhere( { name: 'Purple' } );
+				oColor.set( 'name', 'Violet' );
+			} );
+			
+			$( '#delcolor' ).click( function() {
+				var oColor = goColors.findWhere( { name: 'Red' } );
+				oColor.destroy();
+			} );
+
+			$( '#remove' ).click( function() {
+				
+				// oFooView.trigger( 'model:destroy' );			// no work
+				// oFooView.$el.trigger( 'model:destroy' );				// works!!!
+				
+				// other
+				$( '.other > ul > li' ).trigger( 'model:destroy' );
+				
+				// alert( 'foo' );
+			} );
+			
+			// -------------------------------------------------------------------------------------
+			
+			var oFoo = new Foo( {
+				foo: 'Foo foo...',
+				bar: 'Bar bar...'
+			} );
+			
+			var oFooView = new FooView( {
+				el: $( 'div.bar' ),
+				model: oFoo
+			} );
+			oFooView.render();
+			
+			// console.log( oFooView.$el );
+			
+			// -------------------------------------------------------------------------------------
+
+			var oColor = goColors.findWhere( { name: 'Red' } );
+			var oMyColorView = new MyColor.ItemView( {
+				model: oColor
+			} );
+			
+			// $( '.bar .other ul' ).html( oMyColorView.render().$el );
+			$( '.bar .other ul' ).append( oMyColorView.render().$el );
+			
+		} );
+		
+	</script>
+
+
+</head>
+
+<body>
+
+<h2>Backstab - Factory</h2>
+
+<hr />
+
+<h3>Colors</h3>
+
+<table id="colors">
+	<thead>
+		<th>Name</th>
+		<th>CID</th>
+	</thead>
+	<tbody>
+		<script id="color-tmpl" type="text/x-jquery-tmpl">  
+			<tr>
+				<td class="name"></td>
+				<td class="cid"></td>
+			</tr>
+		</script>	
+	</tbody>
+</table>
+
+<hr />
+
+<table id="foods">
+	<thead>
+		<th>Name</th>
+		<th>Colors</th>
+		<th>CID</th>
+	</thead>
+	<tbody>
+		<script id="food-tmpl" type="text/x-jquery-tmpl">  
+			<tr>
+				<td class="name"></td>
+				<td class="colors"></td>
+				<td class="cid"></td>
+			</tr>
+		</script>
+		<script id="my_colors-tmpl" type="text/x-jquery-tmpl">  
+			<ul></ul>
+		</script>
+		<script id="my_color-tmpl" type="text/x-jquery-tmpl">  
+			<li><span class="name"></span> (<span class="cid"></span>)</li>
+		</script>
+	</tbody>
+</table>
+
+<hr />
+
+<div class="plork"></div>
+
+<div class="bar">
+	<p>Blah blah blah...</p>
+	<div class="foo">Smell my foot...</div>
+	<div class="other">
+		<ul></ul>
+	</div>
+</div>
+
+<hr />
+
+<p>
+	<button id="setcolor">Set Purple to Violet</button>
+	<button id="delcolor">Delete Red</button>
+	<button id="remove">Remove View</button>
+</p>
+
+</body>
+
+</html>

@@ -92,34 +92,46 @@
 		var ivPrms = $.extend( {}, opts.itemView.params );
 		
 		var itemViewExt = {
-
+			
 			events: {
-				'model:change': 'updateItem'
+				'model:change :first': 'updateItem',
+				'model:destroy :first': 'removeItem'
 			},
 			
 			initialize: function() {
 				
-				this.$el = $( '#' + opts.name + '-tmpl' ).tmpl( {} );
+				if ( ivPrms.inittmpl ) {
+					this.$el = $( '#' + opts.name + '-tmpl' ).tmpl( {} );
+				}
 				
 				if ( ivPrms.postinit ) {
 					ivPrms.postinit.call( this );
 				}
 			},
 			
-			updateItem: function() {
+			updateItem: function( e, model ) {
 				
-				this.model.populateElem( this.$el );
+				if ( ivPrms.populatehash ) {
+					this.model.populateElem( this.$el, ivPrms.populatehash );
+				} else {
+					this.model.populateElem( this.$el );
+				}
 				
 				if ( ivPrms.postupdate ) {
 					ivPrms.postupdate.call( this );
 				}
 			},
 			
+			removeItem: function( e, model ) {
+				this.unbind();
+				this.remove();
+			},
+			
 			render: function() {
 				this.updateItem();
 				return this;
 			}
-			
+						
 		};
 		
 		itemViewExt = factorySetup( itemViewExt, opts.itemView, function( ext, params ) {
@@ -139,10 +151,21 @@
 		var listViewExt = {
 			
 			events: {
-				'collection:initialize; collection:add': 'appendItem'
+				'collection:initialize :first; collection:add :first': 'appendItem'
 			},
 			
 			_items: [],
+
+			initialize: function() {
+				
+				if ( lvPrms.inittmpl ) {
+					this.$el = $( '#' + opts.name_plural + '-tmpl' ).tmpl( {} );
+				}
+				
+				if ( lvPrms.postinit ) {
+					lvPrms.postinit.call( this );
+				}
+			},
 			
 			appendItem: function( e, model ) {
 				
@@ -163,6 +186,10 @@
 				}
 				
 				return item;
+			},
+			
+			render: function() {
+				return this;
 			}
 			
 		};
