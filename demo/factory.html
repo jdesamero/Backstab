@@ -7,11 +7,12 @@
 	
 	<link href="../css/style.css" type="text/css" rel="stylesheet" media="screen" />
 	
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js" type="text/javascript"></script>
-	<script src="http://documentcloud.github.com/underscore/underscore-min.js" type="text/javascript"></script>
-	<script src="http://documentcloud.github.com/backbone/backbone-min.js" type="text/javascript"></script>
+	<script src="../dependencies/jquery-1.11.1.min.js" type="text/javascript"></script>
+	<script src="../dependencies/underscore-1.7.0.min.js" type="text/javascript"></script>
+	<script src="../dependencies/backbone-1.1.2.min.js" type="text/javascript"></script>
 	
-	<script src="../etc/jquery.tmpl.js" type="text/javascript"></script>
+	<script src="../dependencies/string_format.js" type="text/javascript"></script>
+	<script src="../dependencies/jquery.tmpl.js" type="text/javascript"></script>
 	
 	<script src="../backstab/underscore.js" type="text/javascript"></script>
 	<script src="../backstab/core.js" type="text/javascript"></script>
@@ -39,16 +40,14 @@
 	
 	<script type="text/javascript">
 		
-		var goColors = null;
-		
 		var Color = Backstab.factory( {
 			
 			name: 'color',
 			
 			itemView: {
 				params: {
-					inittmpl: true,
-					postupdate: function() {
+					initTmpl: true,
+					postUpdate: function() {
 						this.$( '> .cid' ).html( this.cid );
 					}
 				}
@@ -62,8 +61,8 @@
 			
 			itemView: {
 				params: {
-					inittmpl: true,
-					postupdate: function() {
+					initTmpl: true,
+					postUpdate: function() {
 						this.$( '> .cid' ).html( this.cid );
 					}
 				}
@@ -71,7 +70,7 @@
 			
 			listView: {
 				params: {
-					inittmpl: true
+					initTmpl: true
 				}
 			}
 			
@@ -84,20 +83,21 @@
 			itemView: {
 				params: {
 					
-					inittmpl: true,
+					initTmpl: true,
 					
-					postupdate: function() {
+					postUpdate: function() {
 						this.$( '> .cid' ).html( this.cid );
 					},
 					
-					populatehash: {
+					populateHash: {
 						colors: {
 							contents: function( elem, val ) {
 								
+								var oColorsRef = this.attributes.listView.attributes.colorsRef;
 								var oColors = new Color.Collection();
 								
 								$.each( val, function( i, colorName ) {
-									var oColor = goColors.findWhere( { name: colorName } );
+									var oColor = oColorsRef.findWhere( { name: colorName } );
 									oColors.add( oColor );
 								} );
 								
@@ -119,7 +119,7 @@
 		
 		var Foo = Backstab.Model.extend( {} );
 		
-		var FooView = Backbone.View.extend( {
+		var FooView = Backstab.View.extend( {
 			
 			events: {
 				'model:change :first': 'updateItem',
@@ -127,11 +127,7 @@
 			},
 			
 			updateItem: function() {
-				
-				if ( this.model ) {
-					this.model.populateElem( this.$el );
-				}
-								
+				this.extractModelValues();
 			},
 			
 			removeEwt: function( e, model ) {
@@ -147,12 +143,58 @@
 			
 		} );
 		
+		
+		// controls
+		
+		var ControlsView = Backstab.View.extend( {
+			
+			events: {
+				'click #setcolor': 'setColor',
+				'click #delcolor': 'delColor',
+				'click #remove': 'remove',
+				'click #count_elems': 'countElems'
+			},
+			
+			setColor: function() {
+				var oColorsRef = this.attributes.colorsRef;
+				var oColor = oColorsRef.findWhere( { name: 'Purple' } );
+				oColor.set( 'name', 'Violet' );
+			
+			},
+			
+			delColor: function() {
+				var oColorsRef = this.attributes.colorsRef;
+				var oColor = oColorsRef.findWhere( { name: 'Red' } );
+				oColor.destroy();
+			
+			},
+			
+			remove: function() {
+				// oFooView.trigger( 'model:destroy' );			// no work
+				// oFooView.$el.trigger( 'model:destroy' );				// works!!!
+				
+				// other
+				$( '.other > ul > li' ).trigger( 'model:destroy' );
+				
+				// alert( 'foo' );
+			
+			},
+			
+			countElems: function() {
+				var oColorsView = this.attributes.colorListView;
+				console.log( oColorsView._items.length );
+			
+			}
+			
+			
+		} );
+		
+		
  		//// execute
 		
 		jQuery( document ).ready( function( $ ) {			
 			
 			var oColors = new Color.Collection();
-			goColors = oColors;
 			
 			var aColors = [
 				{ name: 'Red' },
@@ -190,32 +232,21 @@
 			
 			var oFoodsView = new Food.ListView( {
 				el: $( '#foods' ),
-				collection: oFoods
+				collection: oFoods,
+				attributes: {
+					colorsRef: oColors
+				}
 			} );
 			
 			// console.log( oFoodsView );
 			
-			// -------------------------------------------------------------------------------------
 			
-			$( '#setcolor' ).click( function() {
-				var oColor = goColors.findWhere( { name: 'Purple' } );
-				oColor.set( 'name', 'Violet' );
-			} );
-			
-			$( '#delcolor' ).click( function() {
-				var oColor = goColors.findWhere( { name: 'Red' } );
-				oColor.destroy();
-			} );
-
-			$( '#remove' ).click( function() {
-				
-				// oFooView.trigger( 'model:destroy' );			// no work
-				// oFooView.$el.trigger( 'model:destroy' );				// works!!!
-				
-				// other
-				$( '.other > ul > li' ).trigger( 'model:destroy' );
-				
-				// alert( 'foo' );
+			var oControls = new ControlsView( {
+				el: $( 'p.controls' ),
+				attributes: {
+					colorsRef: oColors,
+					colorListView: oColorsView
+				}
 			} );
 			
 			// -------------------------------------------------------------------------------------
@@ -234,8 +265,8 @@
 			// console.log( oFooView.$el );
 			
 			// -------------------------------------------------------------------------------------
-
-			var oColor = goColors.findWhere( { name: 'Red' } );
+			
+			var oColor = oColors.findWhere( { name: 'Red' } );
 			var oMyColorView = new MyColor.ItemView( {
 				model: oColor
 			} );
@@ -312,10 +343,11 @@
 
 <hr />
 
-<p>
+<p class="controls">
 	<button id="setcolor">Set Purple to Violet</button>
 	<button id="delcolor">Delete Red</button>
 	<button id="remove">Remove View</button>
+	<button id="count_elems">Count Elems</button>
 </p>
 
 </body>

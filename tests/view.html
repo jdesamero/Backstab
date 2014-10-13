@@ -4,14 +4,16 @@
     
     <meta charset="UTF-8" />
     <title>QUnit - backstab/view.js</title>
-	<link href="http://code.jquery.com/qunit/qunit-1.12.0.css" rel="stylesheet" type="text/css" />
+	
+	<link href="../css/qunit-1.15.0.css" rel="stylesheet" type="text/css" />
 	<link href="../css/style.css" rel="stylesheet" type="text/css" />
 	
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js" type="text/javascript"></script>
-	<script src="http://documentcloud.github.com/underscore/underscore-min.js" type="text/javascript"></script>
-	<script src="http://documentcloud.github.com/backbone/backbone-min.js" type="text/javascript"></script>
+	<script src="../dependencies/jquery-1.11.1.min.js" type="text/javascript"></script>
+	<script src="../dependencies/underscore-1.7.0.min.js" type="text/javascript"></script>
+	<script src="../dependencies/backbone-1.1.2.min.js" type="text/javascript"></script>
 	
-	<script src="../etc/jquery.tmpl.js" type="text/javascript"></script>
+	<script src="../dependencies/string_format.js" type="text/javascript"></script>
+	<script src="../dependencies/jquery.tmpl.js" type="text/javascript"></script>
 	
 	<script src="../backstab/underscore.js" type="text/javascript"></script>
 	<script src="../backstab/core.js" type="text/javascript"></script>
@@ -29,35 +31,32 @@
 <div id="qunit"></div>
 <div id="qunit-fixture"></div>
 
-<style type="text/css">
-	#songlist, #foo {
-		display: none;
-	}
-</style>
-<ul id="songlist">
-	<script id="song-tmpl" type="text/x-jquery-tmpl">  
-		<li>
-			[ <a href="#" class="del">del</a> | <a href="#" class="edit">edit</a> ] 
-			&nbsp;&nbsp;&nbsp; 
-			<span class="name"></span> 
-			(<span class="artist"></span>) 
-			&nbsp;&nbsp;&nbsp;
-			<span class="duration"></span>
-		</li>
-	</script>
-</ul>
-<div id="foo">
-	<div class="foods">
-		<a href="#" id="apple" class="fruit">Apple</a>
-		<a href="#" id="banana" class="fruit">Banana</a>
-		<a href="#" id="broccoli" class="vegetable">Broccoli</a>
-		<a href="#" id="cabbage" class="vegetable">Cabbage</a>
-		<a href="#" id="bacon" class="meat">Bacon</a>
-		<a href="#" id="steak" class="meat">Steak</a>
+<div class="hide">
+	<ul id="songlist">
+		<script id="song-tmpl" type="text/x-jquery-tmpl">  
+			<li>
+				[ <a href="#" class="del">del</a> | <a href="#" class="edit">edit</a> ] 
+				&nbsp;&nbsp;&nbsp; 
+				<span class="name"></span> 
+				(<span class="artist"></span>) 
+				&nbsp;&nbsp;&nbsp;
+				<span class="duration"></span>
+			</li>
+		</script>
+	</ul>
+	<div id="foo">
+		<div class="foods">
+			<a href="#" id="apple" class="fruit">Apple</a>
+			<a href="#" id="banana" class="fruit">Banana</a>
+			<a href="#" id="broccoli" class="vegetable">Broccoli</a>
+			<a href="#" id="cabbage" class="vegetable">Cabbage</a>
+			<a href="#" id="bacon" class="meat">Bacon</a>
+			<a href="#" id="steak" class="meat">Steak</a>
+		</div>
 	</div>
 </div>
 
-<script src="http://code.jquery.com/qunit/qunit-1.12.0.js" type="text/javascript"></script>
+<script src="../dependencies/qunit-1.15.0.js" type="text/javascript"></script>
 <script src="funcs.js" type="text/javascript"></script>
 
 <script type="text/javascript">
@@ -84,7 +83,7 @@ var Foo = Backstab.Foo.extend( {
 	
 	dip: function( testCb, msg ) {
 		this.trigger( 'dip', this, testCb, msg );
-		return 'Calling dip: ' + msg;
+		return 'Calling dip: %s'.printf( msg );
 	}
 	
 } );
@@ -140,7 +139,7 @@ var ItemView = Backstab.View.extend( {
 	},
 	
 	updateSong: function() {
-		this.model.populateElem( this.$el );
+		this.extractModelValues();
 	},
 	
 	render: function() {
@@ -299,7 +298,7 @@ test( 'Delegate Parameters', function() {
 	eCtl.find( '#apple' ).trigger( 'checkval', function( elem, msg ) {
 		var vals1 = { _exp: 'apple sweet' };
 		expected(
-			elem.attr( 'id' ) + ' ' + msg, vals1,
+			'%s %s'.printf( elem.attr( 'id' ), msg ), vals1,
 			'Result of "checkval #apple" should be {{_exp}}'
 		);
 	} );
@@ -307,7 +306,7 @@ test( 'Delegate Parameters', function() {
 	eCtl.find( '#broccoli' ).trigger( 'checkval', function( elem, msg ) {
 		var vals1 = { _exp: 'broccoli bitter' };
 		expected(
-			elem.attr( 'id' ) + ' ' + msg, vals1,
+			'%s %s'.printf( elem.attr( 'id' ), msg ), vals1,
 			'Result of "checkval #broccoli" should be {{_exp}}'
 		);
 	} );
@@ -315,7 +314,7 @@ test( 'Delegate Parameters', function() {
 	eCtl.find( '#bacon' ).trigger( 'checkval', function( elem, msg ) {
 		var vals1 = { _exp: 'bacon savoury' };
 		expected(
-			elem.attr( 'id' ) + ' ' + msg, vals1,
+			'%s %s'.printf( elem.attr( 'id' ), msg ), vals1,
 			'Result of "checkval #bacon" should be {{_exp}}'
 		);
 	} );
@@ -346,19 +345,19 @@ test( 'Multiple delegates per method', function() {
 	expect( 2 );
 	
 	var vals1 = { msg: 'Prepared Cider' };
-	vals1._exp = 'apple ' + vals1.msg
+	vals1._exp = 'apple %s'.printf( vals1.msg );
 	eCtl.find( '#apple' ).trigger( 'prepare', [ function( elem, msg ) {
 		expected(
-			elem.attr( 'id' ) + ' ' + msg, vals1,
+			'%s %s'.printf( elem.attr( 'id' ), msg ), vals1,
 			'Result of "prepare #apple" should be {{_exp}}'
 		);
 	}, vals1.msg ] );
 	
 	var vals2 = { msg: 'Devoured Steak' };
-	vals2._exp = 'steak ' + vals2.msg
+	vals2._exp = 'steak %s'.printf( vals2.msg );
 	eCtl.find( '#steak' ).trigger( 'consume', [ function( elem, msg ) {
 		expected(
-			elem.attr( 'id' ) + ' ' + msg, vals2,
+			'%s %s'.printf( elem.attr( 'id' ), msg ), vals2,
 			'Result of "consume #steak" should be {{_exp}}'
 		);
 	}, vals2.msg ] );
@@ -373,9 +372,9 @@ test( 'Curly brace shorthand', function() {
 	foo1.dip( function( elem, foo, msg ) {
 		var id = elem.attr( 'id' );
 		if ( elem.hasClass( foo.options.baz ) ) {
-			var vals1 = { _exp: id + ' ' + foo1Msg };
+			var vals1 = { _exp: '%s %s'.printf( id, foo1Msg ) };
 			expected(
-				id + ' ' + msg, vals1,
+				'%s %s'.printf( id, msg ), vals1,
 				'foo1.dip msg should be {{_exp}}'
 			);
 		}
@@ -385,9 +384,9 @@ test( 'Curly brace shorthand', function() {
 	foo2.dip( function( elem, foo, msg ) {
 		var id = elem.attr( 'id' );
 		if ( elem.hasClass( foo.options.baz ) ) {
-			var vals1 = { _exp: id + ' ' + foo2Msg };
+			var vals1 = { _exp: '%s %s'.printf( id, foo2Msg ) };
 			expected(
-				id + ' ' + msg, vals1,
+				'%s %s'.printf( id, msg ), vals1,
 				'foo2.dip msg should be {{_exp}}'
 			);
 		}

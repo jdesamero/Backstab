@@ -4,17 +4,20 @@
     
     <meta charset="UTF-8" />
     <title>QUnit - backstab/dispatcher.js</title>
-	<link href="http://code.jquery.com/qunit/qunit-1.12.0.css" rel="stylesheet" type="text/css" />
+	
+	<link href="../css/qunit-1.15.0.css" rel="stylesheet" type="text/css" />
 	<link href="../css/style.css" rel="stylesheet" type="text/css" />
 	
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js" type="text/javascript"></script>
-	<script src="http://documentcloud.github.com/underscore/underscore-min.js" type="text/javascript"></script>
-	<script src="http://documentcloud.github.com/backbone/backbone-min.js" type="text/javascript"></script>
+	<script src="../dependencies/jquery-1.11.1.min.js" type="text/javascript"></script>
+	<script src="../dependencies/underscore-1.7.0.min.js" type="text/javascript"></script>
+	<script src="../dependencies/backbone-1.1.2.min.js" type="text/javascript"></script>
+	
+	<script src="../dependencies/string_format.js" type="text/javascript"></script>
 	
 	<script src="../backstab/underscore.js" type="text/javascript"></script>
 	<script src="../backstab/core.js" type="text/javascript"></script>
 	
-	<script src="../backstab/foo.js" type="text/javascript"></script>
+	<script src="../backstab/view.js" type="text/javascript"></script>
 	<script src="../backstab/dispatcher.js" type="text/javascript"></script>
 	
 </head>
@@ -25,14 +28,56 @@
 
 <div id="qunit"></div>
 <div id="qunit-fixture"></div>
-<script src="http://code.jquery.com/qunit/qunit-1.12.0.js" type="text/javascript"></script>
+
+<div class="hide">
+
+	<div id="div_a"><a href="#">Div A</a></div>
+	<div id="div_b"><a href="#">Div B</a></div>
+
+</div>
+
+<script src="../dependencies/qunit-1.15.0.js" type="text/javascript"></script>
 <script src="funcs.js" type="text/javascript"></script>
 
 <script type="text/javascript">
 
-test( "Backstab.Dispatcher", function() {
+var Div = Backstab.View.extend( {
 	
+	events: {
+		'click a': 'clickLink',
+		'dispatcher:doStuff': 'doStuff'
+	},
 	
+	dispatcher: Backstab.Dispatcher.global,
+	
+	clickLink: function() {
+		
+		this.dispatcher.trigger( 'doStuff', this.$( 'a' ).text() );
+		
+		return false;
+	},
+	
+	doStuff: function( e, sLinkText ) {
+		this.linkText = sLinkText;
+	}
+	
+} );
+
+
+var oDivA = new Div( { el: $( '#div_a' ) } );
+var oDivB = new Div( { el: $( '#div_b' ) } );
+
+$( '#div_a a' ).click();
+
+/* ---------------------------------------------------------------------------------------------- */
+
+test( 'Backstab.Dispatcher', function() {
+	
+	var vals1 = { _exp: 'Div A' };
+	expected(
+		oDivB.linkText, vals1,
+		'oDivB.linkText should be {{_exp}}'
+	);
 	
 } );
 
