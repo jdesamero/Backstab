@@ -105,13 +105,13 @@
 			
 			collectionExt = factorySetup( collectionExt, opts.collection, function( ext, params ) {
 				
-				if ( 'srv' == params.autourl ) {
+				if ( 'srv' == params.autoUrl ) {
 					ext.url = '%s/%s'.printf( opts.script.srv, opts.name );
-				} else if ( 'ajax_content' == params.autourl ) {
+				} else if ( 'ajax_content' == params.autoUrl ) {
 					ext.url = '%s&section=%s'.printf( opts.script.ajax_content, opts.namePlural );
 				}
 				
-				if ( params.parseinfo ) {
+				if ( params.parseInfo ) {
 					
 					ext.parse = function( response, options ) {
 						
@@ -155,8 +155,8 @@
 						this.$el = this.getTmpl( this.getTmplInitVals() );
 					}
 					
-					if ( ivPrms.postinit ) {
-						ivPrms.postinit.call( this );
+					if ( ivPrms.postInit ) {
+						ivPrms.postInit.call( this );
 					}
 				},
 				
@@ -233,8 +233,8 @@
 						this.$el = this.getTmpl( this.getTmplInitVals() );
 					}
 					
-					if ( lvPrms.postinit ) {
-						lvPrms.postinit.call( this );
+					if ( lvPrms.postInit ) {
+						lvPrms.postInit.call( this );
 					}
 				},
 				
