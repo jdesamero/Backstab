@@ -306,7 +306,7 @@
 					
 					var item = new ent.ItemView( {
 						model: model,
-						attributes: {
+						data: {
 							listView: this
 						}
 					} );

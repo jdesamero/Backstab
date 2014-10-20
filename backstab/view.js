@@ -238,6 +238,11 @@
 				var init = obj.initialize;
 				var initWrap = function() {
 					
+					var oArg1 = arguments[ 0 ];
+					if ( oArg1 && oArg1.data ) {
+						this.data = oArg1.data;
+					}
+					
 					var res = init.apply( this, arguments );
 					_this.bindDelegates( this );
 					

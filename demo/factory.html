@@ -93,7 +93,7 @@
 						colors: {
 							contents: function( elem, val ) {
 								
-								var oColorsRef = this.attributes.listView.attributes.colorsRef;
+								var oColorsRef = this.data.listView.data.colorsRef;
 								var oColors = new Color.Collection();
 								
 								$.each( val, function( i, colorName ) {
@@ -156,14 +156,14 @@
 			},
 			
 			setColor: function() {
-				var oColorsRef = this.attributes.colorsRef;
+				var oColorsRef = this.data.colorsRef;
 				var oColor = oColorsRef.findWhere( { name: 'Purple' } );
 				oColor.set( 'name', 'Violet' );
 			
 			},
 			
 			delColor: function() {
-				var oColorsRef = this.attributes.colorsRef;
+				var oColorsRef = this.data.colorsRef;
 				var oColor = oColorsRef.findWhere( { name: 'Red' } );
 				oColor.destroy();
 			
@@ -181,7 +181,7 @@
 			},
 			
 			countElems: function() {
-				var oColorsView = this.attributes.colorListView;
+				var oColorsView = this.data.colorListView;
 				console.log( oColorsView._items.length );
 			
 			}
@@ -233,7 +233,7 @@
 			var oFoodsView = new Food.ListView( {
 				el: $( '#foods' ),
 				collection: oFoods,
-				attributes: {
+				data: {
 					colorsRef: oColors
 				}
 			} );
@@ -243,7 +243,7 @@
 			
 			var oControls = new ControlsView( {
 				el: $( 'p.controls' ),
-				attributes: {
+				data: {
 					colorsRef: oColors,
 					colorListView: oColorsView
 				}

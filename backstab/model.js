@@ -25,8 +25,13 @@
 			this._backboneExtend = Backbone.Model.extend;
 			
 			Backbone.Model.extend = function() {
+				
 				var args = $.makeArray( arguments );
-				// Add code here to modify args before passing to super
+				
+				if ( args[ 0 ] ) {
+					args[ 0 ] = _this.modifyModelProps( args[ 0 ] );
+				}
+				
 				return _this._backboneExtend.apply( Backbone.Model, args );
 			};
 			
@@ -39,10 +44,52 @@
 			return this;
 		},
 		
+		
+		//
+		modifyModelProps: function( obj ) {
+			
+			var _this = this;
+			
+			// make sure there is an initialize() method
+			if ( !obj.initialize ) {
+				obj.initialize = function() { };
+			}
+			
+			
+			// execute bindDelegates() after calling initialize()
+			if ( 'function' === $.type( obj.initialize ) ) {
+				
+				var init = obj.initialize;
+				var initWrap = function() {
+					
+					var oArg2 = arguments[ 1 ];
+					if ( oArg2 && oArg2.data ) {
+						this.data = oArg2.data;
+					}
+					
+					var res = init.apply( this, arguments );
+					
+					return res;
+				};
+				
+				obj.initialize = initWrap;
+			}
+			
+			return obj;
+		},
+		
+		
 		// wrapper for Backbone.Model.extend() which applies enhancements to events
 		extend: function() {
+			
 			var args = $.makeArray( arguments );
-				// Add code here to modify args before passing to super
+			
+			if ( !args[ 0 ] ) {
+				args[ 0 ] = {};
+			}
+			
+			args[ 0 ] = this.modifyModelProps( args[ 0 ] );
+			
 			return Backbone.Model.extend.apply( Backbone.Model, args );
 		}
 		

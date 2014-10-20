@@ -1,0 +1,157 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    
+    <meta charset="UTF-8" />
+    <title>Backstab - Basic CRUD</title>
+	
+	<link href="../css/style.css" type="text/css" rel="stylesheet" media="screen" />
+	
+	<script src="../dependencies/jquery-1.11.1.min.js" type="text/javascript"></script>
+	<script src="../dependencies/underscore-1.7.0.min.js" type="text/javascript"></script>
+	<script src="../dependencies/backbone-1.1.2.min.js" type="text/javascript"></script>
+	
+	<script src="../dependencies/string_format.js" type="text/javascript"></script>
+	<script src="../dependencies/jquery.tmpl.js" type="text/javascript"></script>
+	
+	<script src="../backstab/underscore.js" type="text/javascript"></script>
+	<script src="../backstab/core.js" type="text/javascript"></script>
+	
+	<script src="../backstab/model.js" type="text/javascript"></script>
+	<script src="../backstab/collection.js" type="text/javascript"></script>
+	<script src="../backstab/view.js" type="text/javascript"></script>
+	
+	
+	<script type="text/javascript">
+		
+		
+		var Song = Backstab.Model.extend( {
+			
+			initialize: function() {
+				
+				/* /
+				console.log( 'aaa' );
+				console.log( arguments );
+				console.log( this );
+				/* */
+				
+				console.log( this.data );
+				
+			}
+			
+		} );
+		
+		
+		var oFoo = new Backbone.Model( {
+			'wan': 'too'
+		} );
+
+		var oBar = new Backbone.Model( {
+			'do': 'dis'
+		} );
+		
+		console.log( oFoo );
+		console.log( oBar );
+		
+		console.log( '----' );
+		
+		var Album = Backstab.Collection.extend( {
+			
+			initialize: function() {
+				
+				/* /
+				console.log( 'bbb' );
+				console.log( arguments );
+				console.log( this );
+				/* */
+				
+				console.log( this.data );
+			}
+			
+		} );
+		
+		var SomeView = Backstab.View.extend( {
+			
+			events: {
+				'data.someSong:change': 'doStuff',
+				'data.someSong:change:song': 'doSpecialStuff'
+			},
+			
+			initialize: function() {
+				
+				/* /
+				console.log( 'ccc' );
+				console.log( arguments );
+				console.log( this );
+				/* */
+				
+			},
+			
+			doStuff: function() {
+				console.log( 'stuff happens...' );
+			},
+			
+			doSpecialStuff: function( e, oModel, sValue ) {
+				console.log( sValue );
+			}
+			
+		} );
+		
+ 		//// execute
+		
+		jQuery( document ).ready( function( $ ) {
+			
+			var oSong = new Song( {
+				'artist': 'Keane',
+				'song': 'Somewhere Only We Know',
+				'duration': '3:45'
+			}, {
+				data: {
+					'furdi': 'space mouse',
+					'pudgy': 'niagara falls mouse'
+				}
+			} );
+			
+			var oAlbum = new Album( [ oSong ], {
+				data: {
+					'goo': 'space mouse',
+					'too': 'niagara falls mouse'
+				}
+			} );
+			
+			var oSomeView = new SomeView( {
+				el: $( '#someview' )
+			} );
+
+			var oSomeView2 = new SomeView( {
+				attributes: {
+					'id': 'too',
+					'class': 'bazinga'
+				},
+				data: {
+					someSong: oSong
+				}
+			} );
+			
+			$( 'body' ).append( oSomeView2.render().$el );
+			
+			oSong.set( 'song', 'Foo It...' );
+			
+		} );
+		
+	</script>
+
+
+</head>
+
+<body>
+
+<h2>Fiddle 2</h2>
+
+<hr />
+
+<div id="someview"></div>
+
+</body>
+
+</html>
