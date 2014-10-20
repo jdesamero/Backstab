@@ -65,6 +65,16 @@
 			}
 			
 			return ret;
+		},
+		
+		toggleValue: function( sKey ) {
+			
+			if ( 'boolean' === $.type( this.get( sKey ) ) ) {
+				var bToggle = this.get( sKey ) ? false : true ;
+				this.set( sKey, bToggle );
+			}
+			
+			return this;
 		}
 		
 	} );

@@ -65,6 +65,12 @@
 			oLocalDispatcher = new Backstab.Dispatcher();
 		}
 		
+		var sElementPrefix;
+		if ( opts.useElementPrefix ) {
+			// default element prefix
+			sElementPrefix = '%s_'.printf( opts.name );
+		}
+		
 		var ent = {};
 		
 		
@@ -75,7 +81,11 @@
 			
 			var mdPrms = $.extend( {}, opts.model.params );
 			
-			var modelExt = {};
+			var modelExt = {
+				
+				factory: ent
+				
+			};
 			
 			modelExt = factorySetup( modelExt, opts.model, function( ext, params ) {
 				
@@ -101,7 +111,22 @@
 		
 			var clPrms = $.extend( {}, opts.collection.params );
 			
-			var collectionExt = { model: ent.Model };
+			var collectionExt = {
+				
+				factory: ent,
+				
+				model: ent.Model,
+				
+				loadObjects: function( aObjects ) {
+					
+					var _this = this;
+					
+					$.each( aObjects, function( i, v ) {
+						_this.add( new ent.Model( v ) );
+					} );
+				}
+				
+			};
 			
 			collectionExt = factorySetup( collectionExt, opts.collection, function( ext, params ) {
 				
@@ -144,16 +169,23 @@
 			
 			var itemViewExt = {
 				
+				factory: ent,
+				
 				events: {
 					'model:change :first': 'updateItem',
 					'model:destroy :first': 'removeItem'
 				},
 				
-				initialize: function() {
+				createElement: function() {
 					
-					if ( ivPrms.initTmpl ) {
-						this.$el = this.getTmpl( this.getTmplInitVals() );
+					if ( ent.itemTmpl ) {
+						return ent.itemTmpl.clone();
 					}
+					
+					return this.getTmpl( this.getTmplInitVals() );
+				},
+				
+				initialize: function() {
 					
 					if ( ivPrms.postInit ) {
 						ivPrms.postInit.call( this );
@@ -186,6 +218,11 @@
 				},
 				
 				removeItem: function( e, model ) {
+					
+					if ( ivPrms.removeElem ) {
+						ivPrms.removeElem.call( this );
+					}
+					
 					this.unbind();
 					this.remove();
 				},
@@ -198,7 +235,11 @@
 			};
 			
 			if ( oLocalDispatcher ) {
-				itemViewExt.local_dispatcher = oLocalDispatcher;
+				itemViewExt.localDispatcher = oLocalDispatcher;
+			}
+			
+			if ( sElementPrefix ) {
+				itemViewExt.elementPrefix = sElementPrefix;
 			}
 			
 			itemViewExt = factorySetup( itemViewExt, opts.itemView, function( ext, params ) {
@@ -220,17 +261,30 @@
 			
 			var listViewExt = {
 				
+				factory: ent,
+				
 				events: {
 					'collection:initialize :first; collection:add :first': 'appendItem',
 					'collection:remove': 'removeItem'
 				},
 				
 				_items: [],
-	
+				
+				createElement: function() {
+					return this.getTmpl( this.getTmplInitVals() );
+				},
+				
 				initialize: function() {
 					
-					if ( lvPrms.initTmpl ) {
-						this.$el = this.getTmpl( this.getTmplInitVals() );
+					if ( lvPrms.itemTmplSelector ) {
+
+						var eItemTmpl = this.$( lvPrms.itemTmplSelector );
+						
+						if ( !ent.itemTmpl ) {
+							ent.itemTmpl = eItemTmpl.clone();
+						}
+						
+						eItemTmpl.remove();					
 					}
 					
 					if ( lvPrms.postInit ) {
@@ -292,7 +346,11 @@
 			};
 			
 			if ( oLocalDispatcher ) {
-				listViewExt.local_dispatcher = oLocalDispatcher;
+				listViewExt.localDispatcher = oLocalDispatcher;
+			}
+			
+			if ( sElementPrefix ) {
+				listViewExt.elementPrefix = sElementPrefix;
 			}
 			
 			listViewExt = factorySetup( listViewExt, opts.listView, function( ext, params ) {
@@ -314,6 +372,8 @@
 			
 			var formViewExt = {
 				
+				factory: ent,
+				
 				getTmpl: function( vals, name ) {
 					if ( !name ) name = '%s_form'.printf( opts.name );
 					return getTmplElem( vals, name, opts.unescapeTemplateSrc );
@@ -322,7 +382,11 @@
 			};
 			
 			if ( oLocalDispatcher ) {
-				formViewExt.local_dispatcher = oLocalDispatcher;
+				formViewExt.localDispatcher = oLocalDispatcher;
+			}
+			
+			if ( sElementPrefix ) {
+				formViewExt.elementPrefix = sElementPrefix;
 			}
 			
 			formViewExt = factorySetup( formViewExt, opts.formView, function( ext, params ) {

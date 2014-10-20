@@ -73,7 +73,7 @@
 				
 				var tag = target.prop( 'tagName' ).toLowerCase();
 				
-				if ( 'input' == tag ) {
+				if ( ( 'input' == tag ) || ( 'textarea' == tag ) ) {
 					target.val( val );
 				} else {
 					target.html( val );						
@@ -88,7 +88,7 @@
 		var tag = target.prop( 'tagName' ).toLowerCase();
 		
 		// TO DO!!!!!!
-		if ( 'input' == tag ) {
+		if ( ( 'input' == tag ) || ( 'textarea' == tag ) ) {
 			return target.val();
 		}
 		
@@ -251,7 +251,12 @@
 			obj._ensureElement = function() {
 				
 				if ( !this.el && this.createElement ) {
-					this.el = this.createElement();
+					
+					var eElem = this.createElement();
+					
+					if ( 'object' == $.type( eElem ) ) {
+						this.el = this.createElement();
+					}
 				}
 				
 				return Backbone.View.prototype._ensureElement.apply( this, arguments );
@@ -273,11 +278,22 @@
 				
 				if ( oModel && eElem ) {
 					
-					var data = oModel.toJSON();
+					var data;
+					
+					if ( oModel.toJSON ) {
+						data = oModel.toJSON();
+					} else {
+						data = oModel;
+					}
 					
 					$.each( data, function( prop, val ) {
 						
-						var res = getTarget( eElem, oParams, prop );
+						var sTargetProp = prop;
+						if ( _this.elementPrefix ) {
+							sTargetProp = '%s%s'.printf( _this.elementPrefix, prop );
+						}
+						
+						var res = getTarget( eElem, oParams, sTargetProp );
 						var _target = res[ 0 ];
 						var fcont = res[ 1 ];
 						var defer = res[ 2 ];
@@ -312,6 +328,8 @@
 			
 			obj.getModelDataFromElem = function( oModel, eElem, oParams ) {
 				
+				var _this = this;
+				
 				if ( !oModel ) oModel = this.model;
 				if ( !eElem ) eElem = this.$el;
 				if ( !oParams ) oParams = {};
@@ -326,7 +344,12 @@
 				
 				$.each( data, function( prop, oldval ) {
 					
-					var res = getTarget( eElem, oParams, prop );
+					var sTargetProp = prop;
+					if ( _this.elementPrefix ) {
+						sTargetProp = '%s%s'.printf( _this.elementPrefix, prop );
+					}
+					
+					var res = getTarget( eElem, oParams, sTargetProp );
 					var _target = res[ 0 ];
 					var fcont = res[ 1 ];
 					
