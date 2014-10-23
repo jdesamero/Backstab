@@ -95,6 +95,26 @@
 		
 	} );
 	
+	
+	/* ------------------------------------------------------------------------------------------ */
+	
+	// collection bindings
+	
+	_.extend( Backbone.Collection.prototype, {
+		
+		transfer: function( oModel, oDestCollection ) {
+			
+			if ( this.contains( oModel ) ) {
+				this.remove( oModel );
+				oDestCollection.add( oModel );
+			}
+			
+			return this;
+		}
+		
+	} );
+	
+	
 } ).call( this );
 
 
