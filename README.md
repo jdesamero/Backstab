@@ -428,42 +428,55 @@ oFoo.foo( 'Yay' );
 
 ```
 
+Backstab.family
+--------------
+
+The `Backstab.family()` function creates a family of related models, collections, and views in one namespace.
+
+HTML
+
+```html
+
+	<div id="thinglist"></div>
+	<form id="thingform"></form>
+
+```
+
+Javascript
+
+```javascript
+
+var Thing = Backstab.family( {
+	
+	name: 'thing'
+	
+} );
+
+// model constructor is Thing.Model
+
+var oThings = new Thing.Collection( [
+	{ num: 101, name: 'Umbrella' },
+	{ num: 102, name: 'Shoes' },
+	{ num: 103, name: 'Fan' }
+] );
+
+// an "item view" constructor, Thing.ItemView, is instantiated with the
+// collection's models, and then appended automatically to the "list view"
+
+var oThingsView = new Thing.ListView( {
+	collection: oThings,
+	el: $( '#thinglist' )
+} );
+
+var oThingFormView = new Thing.FormView( {
+	el: $( '#thingform' )
+} );
+
+```
+
+
 Backstab (Core)
 -----------------
-
-The main Backstab object provides the namespace for the various Backstab sub-classes. It also offers 
-loading/override functionality if you want to use the standard Backbone namespace.
-
-```javascript
-
-Backstab.latchToBackbone( 'View', 'Dispatcher', 'Foo' );
-
-// Backbone.View.extend is now Backstab.View.extend
-var ListView = Backbone.View.extend( {
-	...
-} );
-
-// Backbone.Dispatcher.extend is now Backstab.Dispatcher.extend
-var Dispatcher = Backbone.Dispatcher.extend( {
-	...
-} );
-
-// Backbone.Foo.extend is now Backstab.Foo.extend
-var Foo = Backbone.Foo.extend( {
-	...
-} );
-
-```
-
-The `latchToBackbone()` method can be called directly on the sub-class, if preferred.
-
-```javascript
-
-Backstab.View.latchToBackbone();
-// same as:
-// Backstab.latchToBackbone( 'View' );
-
-```
 
 The `createConstructor()` method offers an easy way to define a Backbone.js-style constructor.
 
@@ -476,12 +489,10 @@ Backstab.createConstructor( 'Foo', {
 		alert( 'Bar!!!' );
 	}
 } );
+
 // at this point, Backstab.Foo is now defined
 
-// can latch to Backbone, if you wish
-Backstab.Foo.latchToBackbone();
-
-var Foo = Backbone.Foo.extend( {
+var Foo = Backstab.Foo.extend( {
 	// more methods/properties/overrides
 } );
 
@@ -497,13 +508,14 @@ Backstab adds some more utility functions to the Underscore.js namespace.
 
 The following functions are added:
 
-- ``_.beginsWith( haystack, needle )``. _&lt;content to come&gt;_
+- ``_.beginsWith( haystack, needle, greedy )``. _&lt;content to come&gt;_
 - ``_.expandCurlyShortform( expression )``. _&lt;content to come&gt;_
 - ``_.descendant( object, path )``. _&lt;content to come&gt;_
 - ``_.objectType( object )``. _&lt;content to come&gt;_
 - ``_.descendantsWithMethod( subject, method, maxLevels )``. _&lt;content to come&gt;_
 - ``_.stringify( arg1, arg2, ... argN )``. _&lt;content to come&gt;_
 - ``_.showMe( arg1, arg2, ... argN )``. _&lt;content to come&gt;_
+- ``_.mergeValues( key, target, params )``. _&lt;content to come&gt;_
 
 The following functions are overloaded, original functionality should not be affected:
 
@@ -518,6 +530,6 @@ welcome (especially with documentation and testing)!
 
 License
 =========
-Copyright (c) 2013 Joel Desamero  
+Copyright (c) 2013 - 2014 Joel Desamero  
 Licensed under the MIT license.
 
