@@ -12,6 +12,8 @@
 	<script src="../dependencies/underscore-1.7.0.min.js" type="text/javascript"></script>
 	<script src="../dependencies/backbone-1.1.2.min.js" type="text/javascript"></script>
 	
+	<script src="../dependencies/string_format.js" type="text/javascript"></script>
+
 	<script src="../backstab/underscore.js" type="text/javascript"></script>
 	
 </head>
@@ -29,6 +31,8 @@
 <script type="text/javascript">
 
 test( '_.beginsWith()', function() {
+	
+	expect( 4 );
 	
 	var vals1 = {
 		_exp: true,
@@ -73,7 +77,9 @@ test( '_.beginsWith()', function() {
 } );
 
 test( '_.expandCurlyShortform()', function() {
-
+	
+	expect( 5 );
+	
 	var vals1 = { _exp: 'click a' };
 	expected(
 		_.expandCurlyShortform( vals1._exp ), vals1,
@@ -116,6 +122,8 @@ test( '_.expandCurlyShortform()', function() {
 } );
 
 test( '_.descendant()', function() {
+	
+	expect( 7 );
 	
 	var oTest = {
 		name: 'John Doe',
@@ -184,6 +192,40 @@ test( '_.descendant()', function() {
 	);
 	
 } );
+
+
+test( '_.mergeValues()', function() {
+	
+	expect( 3 );
+	
+	var oTarget = { data: { id: 101, title: 'Untitled' } };
+	var oParams = { data: { title: 'Params Title', params: '1 2 3' } };
+	
+	_.mergeValues( 'data', oTarget, oParams );
+	_.mergeValues( 'data', oTarget, null );			// should have no effect
+	
+	
+	var vals1 = { _exp: 101 };
+	expected(
+		oTarget.data.id, vals1,
+		'oTarget.data.id should be {{_exp}}.'
+	);
+	
+	var vals2 = { _exp: 'Params Title' };
+	expected(
+		oTarget.data.title, vals2,
+		'oTarget.data.title should be {{_exp}}.'
+	);
+	
+	var vals3 = { _exp: '1 2 3' };
+	expected(
+		oTarget.data.params, vals3,
+		'oTarget.data.params should be {{_exp}}.'
+	);
+	
+	
+} );
+
 
 </script>
 

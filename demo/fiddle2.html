@@ -25,6 +25,49 @@
 	<script type="text/javascript">
 		
 		
+		var Backrub = {};
+		
+		Backrub.Model = Backbone.Model.extend( {
+			
+			
+			extend: function() {
+				
+				console.log( 'Adding stuff to the extender...' );
+				
+				return Backbone.Model.apply( this, arguments );
+				
+			},
+			
+			
+			constructor: function() {
+				
+				console.log( 'Adding stuff to the constructor...' );
+				
+				Backbone.Model.apply( this, arguments );
+			}
+			
+		} );
+		
+		
+		console.log( new Backrub.Model( {
+			foo: 'foo...',
+			bar: 'bar...',
+			baz: 'baz...'			
+		} ) );
+		
+		
+		var Backback = new Backrub.Model.extend( {
+			defaults: {
+				foo: 'wan ...',
+				bar: 'too ...',
+				baz: 'tree ...'				
+			}
+		} );
+		
+		
+		
+		// -----------------------------------------------------------------------------------------
+		
 		var Song = Backstab.Model.extend( {
 			
 			initialize: function() {

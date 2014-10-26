@@ -64,17 +64,16 @@
 	
 	<script type="text/javascript">
 		
-		//
-		Backstab.latchToBackbone( 'View', 'StateMachine' );
-		
 		
 		//// params
 		
 		var iAnimDelay = 1000;
 		
-		//// states
 		
-		var SliderState = Backbone.StateMachine.extend( {
+		
+		/* /
+		//// states
+		var SliderState = Backstab.StateMachine.extend( {
 			events: [
 				{ name: 'startup', from: 'none', to: 'transpicker' },
 				
@@ -90,13 +89,35 @@
 		} );
 		
 		var goSliderState = new SliderState();
-
-
+		/* */
+		
+		/* */
+		var goSliderState = new Backstab.StateMachine( {
+			events: [
+				{ name: 'startup', from: 'none', to: 'transpicker' },
+				
+				{ name: 'gotoresults', from: [ 'picker', 'details' ], to: 'transresults' },
+				{ name: 'gotoresults', from: 'transresults', to: 'results' },
+				
+				{ name: 'gotodetails', from: 'results', to: 'transdetails' },
+				{ name: 'gotodetails', from: 'transdetails', to: 'details' },
+				
+				{ name: 'gotopicker', from: [ 'results', 'details' ], to: 'transpicker' },
+				{ name: 'gotopicker', from: 'transpicker', to: 'picker' }
+			]
+		} );
+		/* */
+		
+		
+		// console.log( goSliderState );
+		
+		
+		
 		//// views
 		
 		// slider
 				
-		var SliderView = Backbone.View.extend( {
+		var SliderView = Backstab.View.extend( {
 			
 			events: {
 				
@@ -143,7 +164,7 @@
 		} );
 		
 		// control buttons
-		var ControlsView = Backbone.View.extend( {
+		var ControlsView = Backstab.View.extend( {
 			
 			events: {
 				'click #ctl_1': [ 'goTo', 'results' ],
@@ -167,7 +188,7 @@
 		
 		
 		// control buttons
-		var InfoView = Backbone.View.extend( {
+		var InfoView = Backstab.View.extend( {
 
 			events: {
 				

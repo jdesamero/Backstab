@@ -54,6 +54,8 @@
 			<a href="#" id="steak" class="meat">Steak</a>
 		</div>
 	</div>
+	<div id="bar"></div>
+	<div id="baz">Baz Baz</div>
 </div>
 
 <script src="../dependencies/qunit-1.15.0.js" type="text/javascript"></script>
@@ -154,6 +156,8 @@ var foo1 = new Foo( { baz: 'fruit' } );
 var foo2 = new Foo( { baz: 'vegetable' } );
 var foo3 = new Foo( { baz: 'meat' } );
 
+var sTriggerThisMsg = 'Trigger this message';
+var sTriggerThisEvt = 'triggerThis';
 
 
 // controls
@@ -176,7 +180,10 @@ var ControlsView = Backstab.View.extend( {
 		'prepare .foods; consume .foods': 'foodAction',
 		
 		// curly brace shorthand
-		'foos.{ fruit:dip; vegetable:dip; meat:dip } .foods > a': 'foodDip'
+		'foos.{ fruit:dip; vegetable:dip; meat:dip } .foods > a': 'foodDip',
+		
+		// special "this" selector
+		'triggerThis this': 'thisAction'
 		
 	},
 
@@ -208,6 +215,11 @@ var ControlsView = Backstab.View.extend( {
 	foodDip: function( e, foo, testCb, msg ) {
 		testCb( $( e.target ), foo, msg );
 		return false;
+	},
+	
+	thisAction: function( e ) {
+		this._triggerThisRes = sTriggerThisMsg;
+		this._triggerThisEvt = e.type;
 	}
 	
 } );
@@ -236,22 +248,72 @@ var songlist = new ListView( {
 
 var eSngl = songlist.$el;
 
+var sFooDataValue = 'The foo data value...';
+
 var controls = new ControlsView( {
-	el: $( '#foo' )
+	el: $( '#foo' ),
+	data: {
+		foo: sFooDataValue
+	}
 } );
 
 var eCtl = controls.$el;
 
+controls.trigger( sTriggerThisEvt );
+
+
+var sBarViewDataValue = 'Bar view data value...';
+var sBarLocalDataValue = 'Bar view local data value...';
+
+var BarView = Backstab.View.extend( {
+	data: {
+		value: sBarViewDataValue
+	}
+} );
+
+var oBarView = new BarView( {
+	el: $( '#bar' ),
+	data: {
+		localData: sBarLocalDataValue
+	}
+} );
+
+
+var sBazData = 'This is baz data...';
+
+var oBazView = new Backstab.View( {
+	el: $( '#baz' ),
+	data: {
+		baz: sBazData
+	}
+} );
+
+
 /* ---------------------------------------------------------------------------------------------- */
 
+test( 'new Backstab.View', function() {
+	
+	expect( 1 );
+
+	var vals1 = { _exp: 'Baz Baz' };
+	expected(
+		oBazView.$el.html(), vals1,
+		'oBazView.$el.html() should be {{_exp}}'
+	);
+	
+} );
+
+
 test( 'Backstab.View, Setup', function() {
+	
+	expect( 2 );
 	
 	var vals1 = { _exp: sNameTest };
 	expected(
 		eSngl.find( 'span.name' ).eq( 0 ).html(), vals1,
 		'First song name should be {{_exp}}'
 	);
-
+	
 	var vals2 = { _exp: songs.length };
 	expected(
 		iColInitCount, vals2,
@@ -260,7 +322,40 @@ test( 'Backstab.View, Setup', function() {
 	
 } );
 
+test( 'oView.data', function() {
+
+	expect( 4 );
+	
+	var vals1 = { _exp: sFooDataValue };
+	expected(
+		controls.data.foo, vals1,
+		'controls.data.foo should be {{_exp}}'
+	);
+	
+	var vals2 = { _exp: sBarViewDataValue };
+	expected(
+		oBarView.data.value, vals2,
+		'oBarView.data.value should be {{_exp}}'
+	);
+	
+	var vals3 = { _exp: sBarLocalDataValue };
+	expected(
+		oBarView.data.localData, vals3,
+		'oBarView.data.localData should be {{_exp}}'
+	);
+
+	var vals4 = { _exp: sBazData };
+	expected(
+		oBazView.data.baz, vals4,
+		'oBazView.data.baz should be {{_exp}}'
+	);
+	
+} );
+
+
 test( 'Backstab.View, Model Events', function() {
+	
+	expect( 1 );
 	
 	// change song name
 	var sChangeName = 'On the Run';
@@ -275,6 +370,8 @@ test( 'Backstab.View, Model Events', function() {
 } );
 
 test( 'Backstab.View, Collection Events', function() {
+	
+	expect( 1 );
 	
 	// add new song
 	var sNewName = 'Mr. Roboto';
@@ -393,6 +490,26 @@ test( 'Curly brace shorthand', function() {
 	}, foo2Msg );
 	
 } );
+
+test( '"this" selector', function() {
+	
+	expect( 2 );
+	
+	var vals1 = { _exp: sTriggerThisMsg };
+	expected(
+		controls._triggerThisRes, vals1,
+		'controls._triggerThisRes should be {{_exp}}'
+	);
+	
+	var vals2 = { _exp: sTriggerThisEvt };
+	expected(
+		controls._triggerThisEvt, vals2,
+		'controls._triggerThisEvt should be {{_exp}}'
+	);
+	
+	
+} );
+
 
 </script>
 

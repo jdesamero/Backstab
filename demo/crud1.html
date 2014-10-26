@@ -1,0 +1,456 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    
+    <meta charset="UTF-8" />
+    <title>CRUD - Straight-up Backbone.js</title>
+	
+	<link href="../css/style.css" type="text/css" rel="stylesheet" media="screen" />
+	
+	<script src="../dependencies/jquery-1.11.1.min.js" type="text/javascript"></script>
+	<script src="../dependencies/underscore-1.7.0.min.js" type="text/javascript"></script>
+	<script src="../dependencies/backbone-1.1.2.min.js" type="text/javascript"></script>
+	
+	<script src="../dependencies/string_format.js" type="text/javascript"></script>
+	<script src="../dependencies/jquery.tmpl.js" type="text/javascript"></script>
+	
+	
+	
+	<style type="text/css">
+		
+		#songform label.title {
+			font-weight: bold;
+		}
+		
+		#songform label.field {
+			width: 90px;
+			display: inline-block;
+		}
+		
+	</style>
+	
+	<script type="text/javascript">
+		
+		//// models
+		
+		// song
+		var Song = Backbone.Model.extend( {
+			defaults: {
+				name: 'Not specified',
+				artist: 'Not specified',
+				duration: '0:00'
+			}
+		} );
+		
+		//// collections
+		
+		// album
+		var Album = Backbone.Collection.extend( {
+			model: Song
+		} );
+		
+		
+		//// views
+		
+		// item
+		var ItemView = Backbone.View.extend( {
+			
+			events: {
+				'click .edit': 'editItem',
+				'click .del': 'deleteItem'
+			},
+			
+			initialize: function( options ) {
+				
+				if ( options.data ) {
+					this.data = options.data;
+				}
+				
+				this.$el = $( '#song-tmpl' ).tmpl( {} );
+				
+				this.model.bind( 'change', _.bind( this.updateSong, this ) );
+				this.model.bind( 'destroy', _.bind( this.removeSong, this ) );
+				
+			},
+			
+			updateSong: function() {
+				
+				this.$el.find( '.name' ).html( this.model.get( 'name' ) );
+				this.$el.find( '.artist' ).html( this.model.get( 'artist' ) );
+				this.$el.find( '.duration' ).html( this.model.get( 'duration' ) );
+				
+			},
+			
+			removeSong: function() {				
+				this.unbind();
+				this.remove();
+			},
+			
+			render: function() {
+				this.updateSong();
+				return this;
+			},
+			
+			
+			// controls
+			
+			editItem: function() {
+				this.data.formView.openEditMode( this.model );
+				return false;			
+			},
+			
+			deleteItem: function() {
+				
+				var sMsg = 'Are you sure you want to delete the song "%s" by "%s"?'.printf( this.model.get( 'name' ), this.model.get( 'artist' ) );
+				
+				if ( confirm( sMsg ) ) {
+					this.model.destroy();
+				}
+				
+				return false;			
+			}
+			
+			
+		} );
+		
+		
+		
+		// list
+		var ListView = Backbone.View.extend( {
+			
+			tagName: 'ul',
+			
+			initialize: function( options ) {
+				
+				if ( options.data ) {
+					this.data = options.data;
+				}
+				
+				var _this = this;
+				
+				this.collection.each( function( song ) {
+					_this.addSong( song );
+				} );
+				
+				this.collection.bind( 'add', _.bind( this.addSong, this ) );
+				
+			},
+			
+			addSong: function( song ) {
+				
+				var item = new ItemView( {
+					model: song,
+					data: {
+						formView: this.data.formView,
+						listView: this
+					}
+				} );
+				
+				this.$el.append( item.render().$el );
+				
+				return item;
+			}
+			
+		} );
+		
+		
+		
+		
+		// form
+		var FormView = Backbone.View.extend( {
+
+			events: {
+				'click .add': 'addSong',
+				'click .update': 'updateSong'
+			},
+			
+			
+			initialize: function( options ) {
+				
+				if ( options.data ) {
+					this.data = options.data;
+				}
+				
+				// references
+				this.$titleMode = this.$el.find( '.title .mode' );
+				this.$addBtn = this.$el.find( 'input.add' );
+				this.$updateBtn = this.$el.find( 'input.update' );
+				
+				this.$el.hide();
+				
+			},
+			
+			openAddMode: function( album ) {
+				
+				this._album = album;			// current album
+				
+				this.$titleMode.html( 'Add' );
+				
+				// reset the form
+				this.$el.find( 'input[type="text"]' ).val( '' );
+				
+				this.$addBtn.show();
+				this.$updateBtn.hide();
+				
+				this.$el.show();				
+			},
+			
+			openEditMode: function( song ) {
+				
+				this._song = song;				// current song
+				
+				this.$titleMode.html( 'Update' );
+				
+				// unload data from model to the form
+				this.$el.find( '.name' ).val( song.get( 'name' ) );
+				this.$el.find( '.artist' ).val( song.get( 'artist' ) );
+				this.$el.find( '.duration' ).val( song.get( 'duration' ) );
+				
+				this.$addBtn.hide();
+				this.$updateBtn.show();
+				
+				this.$el.show();			
+			},
+			
+			
+			addSong: function() {
+				
+				var song = new Song();
+				
+				song.set( {
+					'name': this.$el.find( '.name' ).val(),
+					'artist': this.$el.find( '.artist' ).val(),
+					'duration': this.$el.find( '.duration' ).val()
+				} );
+				
+				this._album.add( song );
+				this.$el.hide();				
+			},
+			
+			updateSong: function() {
+				
+				this._song.set( {
+					'name': this.$el.find( '.name' ).val(),
+					'artist': this.$el.find( '.artist' ).val(),
+					'duration': this.$el.find( '.duration' ).val()
+				} );
+				
+				this.$el.hide();
+			}
+			
+		} );
+		
+		
+		// controls
+		var ControlsView = Backbone.View.extend( {
+			
+			events: {
+				'click': 'addItem'
+			},
+			
+			initialize: function( options ) {
+				
+				if ( options.data ) {
+					this.data = options.data;
+				}
+				
+				this.$el = $( '<a href="#">Add Song<\/a>' );
+			},
+			
+			addItem: function() {
+				
+				this.data.formView.openAddMode( this.data.album );
+				
+				return false;
+			}
+			
+		} );
+		
+		
+		// external controls
+		var ExtControlsView = Backbone.View.extend( {
+			
+			events: {
+				'click #new_list': 'newList',
+				'click #remove_test': 'removeTest'
+			},
+			
+			initialize: function( options ) {
+				
+				if ( options.data ) {
+					this.data = options.data;
+				}
+				
+			},
+			
+			newList: function() {
+				
+				var oNewAlbum = new Album();
+				
+				var oNewAlbumView = new ListView( {
+					collection: oNewAlbum,
+					data: {
+						formView: this.data.formView
+					}
+				} );
+
+				var oNewAddButton = new ControlsView( {
+					data: {
+						formView: this.data.formView,
+						album: oNewAlbum
+					}
+				} );
+				
+				
+				var eList2 = $( '#list2' );
+				
+				eList2.append( oNewAddButton.render().$el );
+				eList2.append( '<br />' );
+				eList2.append( oNewAlbumView.render().$el );
+				eList2.append( '<hr />' );
+				
+				return false;			
+			},
+			
+			removeTest: function() {
+			
+				this.data.song3.destroy();
+				
+				return false;
+			}
+			
+		} );
+	
+		
+		
+		
+ 		//// execute
+		
+		jQuery( document ).ready( function( $ ) {			
+			
+			//// model
+			
+			/* /
+			
+			// This works, but array of objects works just as fine
+			
+			var oSong1 = new Song( { name: 'Team', artist: 'Lorde', duration: '2:33' } );
+			var oSong2 = new Song( { name: 'Pompeii', artist: 'Bastille', duration: '5:40' } );
+			var oSong3 = new Song( { name: 'Love Will Tear Us Apart', artist: 'Joy Division', duration: '3:19' } );
+			var oSong4 = new Song( { name: 'Ceremony', artist: 'New Order', duration: '5:01' } );
+			var oSong5 = new Song( { name: 'Rhythm of the Night', artist: 'Corona', duration: '3:10' } );
+			
+			var aSongs = [ oSong1, oSong2, oSong3, oSong4, oSong5 ];
+
+			/* */
+			
+			var aSongs = [
+				{ name: 'Team', artist: 'Lorde', duration: '2:33' },
+				{ name: 'Pompeii', artist: 'Bastille', duration: '5:40' },
+				{ name: 'Love Will Tear Us Apart', artist: 'Joy Division', duration: '3:19' },
+				{ name: 'Ceremony', artist: 'New Order', duration: '5:01' },
+				{ name: 'Rhythm of the Night', artist: 'Corona', duration: '3:10' }
+			];
+			
+			var oAlbum = new Album( aSongs );
+			// console.log( oAlbum.models );
+			
+			
+			//// views
+
+			var oForm = new FormView( {
+				el: $( '#songform' )
+			} );
+			
+			var oAlbumView = new ListView( {
+				collection: oAlbum,
+				el: $( '#songlist' ),
+				data: {
+					formView: oForm
+				}
+			} );
+			
+			var oAddButton = new ControlsView( {
+				data: {
+					album: oAlbum,
+					formView: oForm
+				}
+			} );
+			
+			oAddButton.setElement( $( '#add_song' ) );
+			
+			var oExtControls = new ExtControlsView( {
+				el: $( '.ext_controls' ),
+				data: {
+					song3: oAlbum.at( 2 ),
+					formView: oForm,
+					listView: oAlbum
+				}
+			} );
+			
+		} );
+		
+	</script>
+
+
+</head>
+
+<body>
+
+<h2>CRUD - Straight-up Backbone.js</h2>
+
+<p><a href="../index.html">Main Menu</a></p>
+
+<hr />
+
+<table><tr><td>
+
+	<a href="#" id="add_song">Add Song</a>
+	
+	<br />
+	
+	<ul id="songlist">
+		<script id="song-tmpl" type="text/x-jquery-tmpl">  
+			<li>
+				[ <a href="#" class="del">del</a> | <a href="#" class="edit">edit</a> ] 
+				&nbsp;&nbsp;&nbsp; 
+				<span class="name"></span> 
+				(<span class="artist"></span>) 
+				&nbsp;&nbsp;&nbsp;
+				<span class="duration"></span>
+			</li>
+		</script>
+	</ul>
+
+</td><td>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</td><td id="list2">
+
+
+
+</td></tr></table>
+
+<form id="songform">
+	
+	<label class="title"><span class="mode"></span> Song:</label><br />
+	
+	<label class="field">Name:</label> <input type="text" class="name" /><br />
+	<label class="field">Artist:</label> <input type="text" class="artist" /><br />
+	<label class="field">Duration:</label> <input type="text" class="duration" /><br />
+	
+	<input type="button" class="add" value="Add" />
+	<input type="button" class="update" value="Update" />
+	
+</form>
+
+<hr />
+
+<div class="ext_controls">
+	<a href="#" id="new_list">New List</a> | 
+	<a href="#" id="remove_test">Remove Test</a> | 
+	<a href="#" id="get_len">Get Length</a>
+</div>
+
+</body>
+
+</html>

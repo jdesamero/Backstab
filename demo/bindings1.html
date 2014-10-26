@@ -3,7 +3,7 @@
 <head>
     
     <meta charset="UTF-8" />
-    <title>Backstab - Bindings</title>
+    <title>Backstab - Event Bindings 1</title>
 	
 	<link href="../css/style.css" type="text/css" rel="stylesheet" media="screen" />
 	
@@ -23,10 +23,8 @@
 	
 	<script type="text/javascript">
 		
-		//
-		Backstab.latchToBackbone( 'View', 'Foo' );
 		
-		var Foo = Backbone.Foo.extend( {
+		var Foo = Backstab.Foo.extend( {
 			performBar: function( baz, quux ) {
 				// do stuff
 				this.trigger( 'bar', this, baz, quux );
@@ -40,7 +38,7 @@
 		};
 		
 		// control buttons
-		var ControlsView = Backbone.View.extend( {
+		var ControlsView = Backstab.View.extend( {
 			
 			events: {
 				

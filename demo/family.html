@@ -23,7 +23,7 @@
 	<script src="../backstab/dispatcher.js" type="text/javascript"></script>
 	<script src="../backstab/foo.js" type="text/javascript"></script>
 	
-	<script src="../backstab/factory.js" type="text/javascript"></script>
+	<script src="../backstab/family.js" type="text/javascript"></script>
 	
 	
 	<style type="text/css">
@@ -40,13 +40,12 @@
 	
 	<script type="text/javascript">
 		
-		var Color = Backstab.factory( {
+		var Color = Backstab.family( {
 			
 			name: 'color',
 			
 			itemView: {
 				params: {
-					initTmpl: true,
 					postUpdate: function() {
 						this.$( '> .cid' ).html( this.cid );
 					}
@@ -55,35 +54,26 @@
 			
 		} );
 		
-		var MyColor = Backstab.factory( {
+		var MyColor = Backstab.family( {
 			
 			name: 'my_color',
 			
 			itemView: {
 				params: {
-					initTmpl: true,
 					postUpdate: function() {
 						this.$( '> .cid' ).html( this.cid );
 					}
-				}
-			},
-			
-			listView: {
-				params: {
-					initTmpl: true
 				}
 			}
 			
 		} );
 		
-		var Food = Backstab.factory( {
+		var Food = Backstab.family( {
 			
 			name: 'food',
 			
 			itemView: {
 				params: {
-					
-					initTmpl: true,
 					
 					postUpdate: function() {
 						this.$( '> .cid' ).html( this.cid );
@@ -93,7 +83,9 @@
 						colors: {
 							contents: function( elem, val ) {
 								
-								var oColorsRef = this.data.listView.data.colorsRef;
+								var oListView = this.data.listView;
+								
+								var oColorsRef = oListView.data.colorsRef;
 								var oColors = new Color.Collection();
 								
 								$.each( val, function( i, colorName ) {
@@ -163,10 +155,16 @@
 			},
 			
 			delColor: function() {
+				
 				var oColorsRef = this.data.colorsRef;
 				var oColor = oColorsRef.findWhere( { name: 'Red' } );
-				oColor.destroy();
-			
+				
+				if ( oColor ) {
+					oColor.destroy();
+				} else {
+					alert( 'Red was already deleted...' );
+				}
+				
 			},
 			
 			remove: function() {
@@ -216,19 +214,14 @@
 			
 			// -------------------------------------------------------------------------------------
 			
-			var oFoods = new Food.Collection();
-			
-			var aFoods = [
+			var oFoods = new Food.Collection( [
 				{ name: 'Apple', colors: [ 'Red', 'Green' ] },
 				{ name: 'Meat', colors: [ 'Red', 'Brown' ] },
 				{ name: 'Eggplant', colors: [ 'Green', 'Purple' ] },
 				{ name: 'Mango', colors: [ 'Green', 'Yellow', 'Red' ] },
 				{ name: 'Grape', colors: [ 'Green', 'Purple' ] }
-			];
+			] );
 			
-			$.each( aFoods, function( i, v ) {
-				oFoods.add( new Food.Model( v ) );
-			} );
 			
 			var oFoodsView = new Food.ListView( {
 				el: $( '#foods' ),
@@ -283,7 +276,7 @@
 
 <body>
 
-<h2>Backstab - Factory</h2>
+<h2>Backstab - Family</h2>
 
 <hr />
 

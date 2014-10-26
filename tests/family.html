@@ -1,0 +1,191 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    
+    <meta charset="UTF-8" />
+    <title>QUnit - backstab/family.js</title>
+	
+	<link href="../css/qunit-1.15.0.css" rel="stylesheet" type="text/css" />
+	<link href="../css/style.css" rel="stylesheet" type="text/css" />
+	
+	<script src="../dependencies/jquery-1.11.1.min.js" type="text/javascript"></script>
+	<script src="../dependencies/underscore-1.7.0.min.js" type="text/javascript"></script>
+	<script src="../dependencies/backbone-1.1.2.min.js" type="text/javascript"></script>
+	
+	<script src="../dependencies/string_format.js" type="text/javascript"></script>
+	<script src="../dependencies/jquery.tmpl.js" type="text/javascript"></script>
+	
+	<script src="../backstab/underscore.js" type="text/javascript"></script>
+	<script src="../backstab/core.js" type="text/javascript"></script>
+	
+	<script src="../backstab/dispatcher.js" type="text/javascript"></script>
+	<script src="../backstab/model.js" type="text/javascript"></script>
+	<script src="../backstab/collection.js" type="text/javascript"></script>
+	<script src="../backstab/view.js" type="text/javascript"></script>
+	<script src="../backstab/family.js" type="text/javascript"></script>
+	
+</head>
+
+<body>
+
+<p><a href="index.html">Main Menu</a></p>
+
+<div id="qunit"></div>
+<div id="qunit-fixture"></div>
+
+<div class="hide">
+	<div id="thinglist"></div>
+	<form id="thingform"></form>
+</div>
+
+<script src="../dependencies/qunit-1.15.0.js" type="text/javascript"></script>
+<script src="funcs.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+
+var iItemPostInitCheck = 0;
+
+var bListPostInitCheck = false;
+var bListCollectionCheck = false;
+
+var bFormPostInitCheck = false;
+
+
+var Thing = Backstab.family( {
+	
+	name: 'thing',
+	
+	itemView: {
+		
+		params: {
+			
+			postInit: function() {
+				
+				var oListView = this.data.listView;
+				
+				if ( 'bar' === oListView.data.foo ) {
+					iItemPostInitCheck++;
+				}
+			}
+			
+		}
+		
+	},
+	
+	listView: {
+		
+		params: {
+			
+			postInit: function() {
+				
+				if ( 'bar' === this.data.foo ) {
+					bListPostInitCheck = true;
+				}
+				
+				if ( 'Bunch of things...' === this.collection.data.yes ) {
+					bListCollectionCheck = true;
+				}
+			}
+			
+		}
+		
+	},
+	
+	formView: {
+		
+		params: {
+			
+			postInit: function() {
+				
+				if ( 'baz' === this.data.foo ) {
+					bFormPostInitCheck = true;
+				}
+			}
+			
+		}
+		
+	}
+	
+} );
+
+var oThings = new Thing.Collection( [
+	{ num: 101, name: 'Umbrella' },
+	{ num: 102, name: 'Shoes' },
+	{ num: 103, name: 'Fan' }
+], {
+	data: {
+		yes: 'Bunch of things...'
+	}
+} );
+
+
+var oThingsView = new Thing.ListView( {
+	collection: oThings,
+	el: $( '#thinglist' ),
+	data: {
+		foo: 'bar'
+	}
+} );
+
+var oThingFormView = new Thing.FormView( {
+	el: $( '#thingform' ),
+	data: {
+		foo: 'baz'
+	}
+} );
+
+
+test( 'Backstab.family(), params.postInit()', function() {
+	
+	expect( 4 );
+	
+	
+	var vals1 = { _exp: 3 };
+	expected(
+		iItemPostInitCheck, vals1,
+		'iItemPostInitCheck should be {{_exp}}'
+	);
+	
+	var vals2 = { _exp: true };
+	expected(
+		bListPostInitCheck, vals2,
+		'bListPostInitCheck should be {{_exp}}'
+	);
+	
+	var vals3 = { _exp: true };
+	expected(
+		bFormPostInitCheck, vals3,
+		'bFormPostInitCheck should be {{_exp}}'
+	);
+	
+	var vals4 = { _exp: true };
+	expected(
+		bListCollectionCheck, vals4,
+		'bListCollectionCheck should be {{_exp}}'
+	);
+	
+} );
+
+test( 'Backstab.family(), ItemView', function() {
+	
+	expect( 1 );
+	
+	
+	var vals1 = { _exp: 3 };
+	expected(
+		$( '#thinglist > div' ).length, vals1,
+		"$( '#thinglist > div' ).length should be {{_exp}}"
+	);
+	
+	
+} );
+
+
+
+
+
+</script>
+
+</body>
+
+</html>

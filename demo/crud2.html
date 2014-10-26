@@ -3,7 +3,7 @@
 <head>
     
     <meta charset="UTF-8" />
-    <title>Backstab - Basic CRUD</title>
+    <title>CRUD - Use Backstab classes instead of Backbone</title>
 	
 	<link href="../css/style.css" type="text/css" rel="stylesheet" media="screen" />
 	
@@ -20,8 +20,6 @@
 	<script src="../backstab/model.js" type="text/javascript"></script>
 	<script src="../backstab/collection.js" type="text/javascript"></script>
 	<script src="../backstab/view.js" type="text/javascript"></script>
-	<script src="../backstab/dispatcher.js" type="text/javascript"></script>
-	<script src="../backstab/foo.js" type="text/javascript"></script>
 	
 	
 	
@@ -36,9 +34,26 @@
 			display: inline-block;
 		}
 		
+		a.button_border {
+			border: solid 1px black;
+			padding: 3px 6px;
+		}
+		
 	</style>
 	
 	<script type="text/javascript">
+		
+		;( function ( $ ) {
+			
+			$.fn.fooBar = function( options ) {
+				
+				return $( this ).each( function() {
+					$( this ).addClass( 'button_border' );
+				} );
+			};
+			
+		} )( jQuery );
+		
 		
 		
 		//// models
@@ -61,19 +76,16 @@
 		
 		
 		//// views
-				
 		
 		// item
 		var ItemView = Backstab.View.extend( {
 			
 			events: {
+				'model:change this': 'updateSong',
+				'model:destroy this': 'removeSong',
 				'click .edit': 'editItem',
-				'click .del': 'deleteItem',
-				'model:change': 'updateSong',
-				'model:destroy': 'removeSong'
+				'click .del': 'deleteItem'
 			},
-			
-			dispatcher: Backstab.Dispatcher.global,
 			
 			createElement: function() {
 				return $( '#song-tmpl' ).tmpl( {} );
@@ -83,13 +95,21 @@
 				this.extractModelValues();
 			},
 			
+			removeSong: function() {				
+				this.unbind();
+				this.remove();
+			},
+			
 			render: function() {
 				this.updateSong();
 				return this;
 			},
 			
+			
+			// controls
+			
 			editItem: function() {
-				this.dispatcher.trigger( 'editSong', this.model );
+				this.data.formView.openEditMode( this.model );
 				return false;			
 			},
 			
@@ -102,68 +122,50 @@
 				}
 				
 				return false;			
-			},
-			
-			removeSong: function() {				
-				this.unbind();
-				this.remove();
 			}
 			
+			
 		} );
+		
 		
 		
 		// list
 		var ListView = Backstab.View.extend( {
 			
 			events: {
-				'collection:initialize; collection:add': 'addSong'
+				'collection:initialize this; collection:add this': 'addSong'
 			},
 			
 			tagName: 'ul',
 			
-			dispatcher: Backstab.Dispatcher.global,
-			
 			addSong: function( e, song ) {
 				
-				var item = new ItemView( { model: song } );
+				var item = new ItemView( {
+					model: song,
+					data: {
+						formView: this.data.formView,
+						listView: this
+					}
+				} );
+				
 				this.$el.append( item.render().$el );
 				
 				return item;
-			},
-			
-			render: function() {
-				return this;		
 			}
 			
 		} );
-
+		
+		
+		
 		
 		// form
 		var FormView = Backstab.View.extend( {
 
 			events: {
-				'click .add': 'addItem',
-				'click .update': 'updateItem',
-				'dispatcher:editSong': 'editSong',
-				'dispatcher:bogus .title': 'fooBar',
-				'dispatcher:blarg .name': 'gooBar'
+				'click .add': 'addSong',
+				'click .update': 'updateSong'
 			},
 			
-			fooBar: function( e, val ) {
-				// $( e.target ).html( val );
-				// alert( $( e.target ).prop( 'tagName' ) );
-				// _.showMe( val );
-				_.showMe( e );
-			},
-
-			gooBar: function( e, val ) {
-				// $( e.target ).html( val );
-				// alert( $( e.target ).prop( 'tagName' ) );
-				// _.showMe( val );
-				_.showMe( e );
-			},
-			
-			dispatcher: Backstab.Dispatcher.global,
 			
 			initialize: function() {
 				
@@ -176,9 +178,9 @@
 				
 			},
 			
-			addSong: function( album ) {
+			openAddMode: function( album ) {
 				
-				this._album = album;			// ??????
+				this._album = album;			// current album
 				
 				this.$titleMode.html( 'Add' );
 				
@@ -191,14 +193,15 @@
 				this.$el.show();				
 			},
 			
-			editSong: function( e, song ) {
+			openEditMode: function( song ) {
 				
-				this._song = song;				// ??????
+				this._song = song;				// current song
 				
 				this.$titleMode.html( 'Update' );
 				
 				// unload data from model to the form
 				this.extractModelValues( song );
+				
 				
 				this.$addBtn.hide();
 				this.$updateBtn.show();
@@ -207,7 +210,7 @@
 			},
 			
 			
-			addItem: function() {
+			addSong: function() {
 				
 				var song = new Song();
 				
@@ -217,12 +220,99 @@
 				this.$el.hide();				
 			},
 			
-			updateItem: function() {
+			updateSong: function() {
+				
 				this.setModelValues( this._song );
+				
 				this.$el.hide();
 			}
 			
 		} );
+		
+		
+		// controls
+		var ControlsView = Backstab.View.extend( {
+			
+			events: {
+				'click': 'addItem'
+			},
+			
+			createElement: function() {
+				return $( '<a href="#" class="addsong">Add Song!<\/a>' );			
+			},
+			
+			initialize: function() {
+				this.$el.fooBar();			
+			},
+			
+			addItem: function() {
+				
+				this.data.formView.openAddMode( this.data.album );
+				
+				return false;
+			}
+			
+		} );
+		
+		
+		// external controls
+		var ExtControlsView = Backstab.View.extend( {
+			
+			events: {
+				'click #new_list': 'newList',
+				'click #remove_test': 'removeTest'
+			},
+			
+			newList: function() {
+				
+				var oNewAlbum = new Album();
+				
+				var oNewAlbumView = new ListView( {
+					collection: oNewAlbum,
+					data: {
+						formView: this.data.formView
+					}
+				} );
+
+				var oNewAddButton = new ControlsView( {
+					data: {
+						formView: this.data.formView,
+						album: oNewAlbum
+					}
+				} );
+				
+				
+				var eList2 = $( '#list2' );
+				
+				if ( eList2.find( 'a.addsong' ).length ) {
+					eList2.append( '<hr />' );
+				}
+				
+				eList2.append( oNewAddButton.render().$el );
+				eList2.append( '<br />' );
+				eList2.append( oNewAlbumView.render().$el );
+				
+				
+				return false;			
+			},
+			
+			removeTest: function() {
+			
+				this.data.song3.destroy();
+				
+				return false;
+			}
+			
+		} );
+	
+		
+		
+		var oFooView = new Backstab.View( {
+			
+			tagName: 'p'
+			
+		} );
+		
 		
 		
  		//// execute
@@ -231,81 +321,50 @@
 			
 			//// model
 			
-			var oSong1 = new Song( { name: 'How Bizarre', artist: 'OMC', duration: '2:33' } );
-			var oSong2 = new Song( { name: 'Sexual Healing', artist: 'Marvin Gaye', duration: '5:40' } );
-			var oSong3 = new Song( { name: 'Talk It Over In Bed', artist: 'OMC', duration: '3:19' } );
-			var oSong4 = new Song( { name: 'Stillnes Is The Move', artist: 'Dirty Projectors', duration: '5:01' } );
-			var oSong5 = new Song( { name: 'Mr. Roboto', artist: 'Styx', duration: '3:10' } );
-			
-			// var aSongs = [ oSong1, oSong2, oSong3, oSong4, oSong5 ];
-			var aSongs = [ oSong1, oSong2, oSong3, oSong4 ];
+			var aSongs = [
+				{ name: 'Team', artist: 'Lorde', duration: '2:33' },
+				{ name: 'Pompeii', artist: 'Bastille', duration: '5:40' },
+				{ name: 'Love Will Tear Us Apart', artist: 'Joy Division', duration: '3:19' },
+				{ name: 'Ceremony', artist: 'New Order', duration: '5:01' },
+				{ name: 'Rhythm of the Night', artist: 'Corona', duration: '3:10' }
+			];
 			
 			var oAlbum = new Album( aSongs );
 			// console.log( oAlbum.models );
-						
-			oAlbum.add( oSong5 );
 			
-			
-			/* /
-			var oModel = new Backstab.Model( {
-				foo: 'Foo....',
-				bar: 'Bar....'
-			} );
-			
-			console.log( oModel );
-			/* */
 			
 			//// views
-			
-			var oAlbumView = new ListView( {
-				collection: oAlbum,
-				el: $( '#songlist' )
-			} );
-			
 
-			var oFormView = new FormView( {
+			var oForm = new FormView( {
 				el: $( '#songform' )
 			} );
 			
-			//// invoke
-
-			$( '#add_song' ).click( function() {
-				oFormView.addSong( oAlbum );
-				return false;
+			var oAlbumView = new ListView( {
+				collection: oAlbum,
+				el: $( '#songlist' ),
+				data: {
+					formView: oForm
+				}
 			} );
 			
-			//
-			$( '#ctl_1' ).click( function() {
-				_.showMe( oAlbum.models );
-				return false;
-			} );
-						
-			$( '#ctl_3' ).click( function() {
-				
-				var oNewAlbum = new Album();
-				var oNewAlbumView = new ListView( {
-					collection: oNewAlbum
-				} );
-				
-				var eList2 = $( '#list2' );
-				
-				if ( eList2.find( '.addsong' ).length ) {
-					eList2.append( '<hr \/>' );
+			var oAddButton = new ControlsView( {
+				el: $( '#add_song' ),
+				data: {
+					formView: oForm,
+					album: oAlbum
 				}
-				
-				var eAddSong = $( '<a href="#" class="addsong">Add Song!<\/a>' );
-				eAddSong.on( 'click', function() {
-					oFormView.addSong( oNewAlbum );
-					return false;
-				} );
-				
-				eList2.append( eAddSong );
-				eList2.append( '<br \/>' );
-				eList2.append( oNewAlbumView.render().$el );
-				
-				return false;
 			} );
-						
+			
+			var oExtControls = new ExtControlsView( {
+				el: $( '.ext_controls' ),
+				data: {
+					formView: oForm,
+					listView: oAlbum,
+					song3: oAlbum.at( 2 )
+				}
+			} );
+			
+			
 		} );
 		
 	</script>
@@ -315,7 +374,7 @@
 
 <body>
 
-<h2>Backstab - Basic CRUD</h2>
+<h2>CRUD - Use Backstab classes instead of Backbone</h2>
 
 <p><a href="../index.html">Main Menu</a></p>
 
@@ -363,8 +422,10 @@
 
 <hr />
 
-<a href="#" id="ctl_1">View Collection</a> | 
-<a href="#" id="ctl_3">New List</a>
+<div class="ext_controls">
+	<a href="#" id="new_list">New List</a> | 
+	<a href="#" id="remove_test">Remove Test</a>
+</div>
 
 </body>
 

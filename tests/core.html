@@ -60,9 +60,7 @@ var oQObj = new QClass( {
 	name: 'Object Name'
 } );
 
-Backstab.latchToBackbone( 'QUnit' );
-
-var oQBack = new Backbone.QUnit( {
+var oQBack = new Backstab.QUnit( {
 	title: 'QBack Title'
 } );
 
@@ -120,12 +118,12 @@ test( 'Backstab.createConstructor()', function() {
 		
 } );
 
-test( 'Backstab.latchToBackbone()', function() {
+test( 'new Backstab()', function() {
 	
 	var vals1 = { _exp: 'function' };
 	expected(
-		$.type( Backbone.QUnit ), vals1,
-		'Backbone.QUnit is a {{_exp}}'
+		$.type( Backstab.QUnit ), vals1,
+		'Backstab.QUnit is a {{_exp}}'
 	);
 
 	var vals2 = { _exp: 'object' };
