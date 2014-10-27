@@ -56,6 +56,7 @@
 	</div>
 	<div id="bar"></div>
 	<div id="baz">Baz Baz</div>
+	<div id="quux"></div>
 </div>
 
 <script src="../dependencies/qunit-1.15.0.js" type="text/javascript"></script>
@@ -289,6 +290,59 @@ var oBazView = new Backstab.View( {
 } );
 
 
+
+
+var QuuxView = Backstab.View.extend( {
+	
+	events: {
+		'model:change this': 'doStuff',
+		'model:change:foo this': 'doFooStuff',
+		'data.some:change this': 'doOtherStuff',
+		'data.some:change:baz this': 'doBazStuff'
+	},
+	
+	// handlers for model
+	
+	doStuff: function( e ) {
+		this._checkType1 = e.type;
+		this._checkNs1 = e[ 'namespace' ];
+	},
+	
+	doFooStuff: function( e ) {
+		this._checkType2 = e.type;
+		this._checkNs2 = e[ 'namespace' ];
+	},
+	
+	// handlers for data.som
+	
+	doOtherStuff: function( e ) {
+		this._checkType3 = e.type;
+		this._checkNs3 = e[ 'namespace' ];
+	},
+	
+	doBazStuff: function( e ) {
+		this._checkType4 = e.type;
+		this._checkNs4 = e[ 'namespace' ];
+	}
+	
+	
+} );
+
+var oModel = new Backstab.Model();
+var oDataModel = new Backstab.Model();
+
+
+var oQuuxView = new QuuxView( {
+	el: $( '#quux' ),
+	model: oModel,
+	data: {
+		some: oDataModel
+	}
+} );
+
+oModel.set( { foo: 'bar' } );
+oDataModel.set( { baz: 'quux' } );
+
 /* ---------------------------------------------------------------------------------------------- */
 
 test( 'new Backstab.View', function() {
@@ -493,7 +547,7 @@ test( 'Curly brace shorthand', function() {
 
 test( '"this" selector', function() {
 	
-	expect( 2 );
+	expect( 10 );
 	
 	var vals1 = { _exp: sTriggerThisMsg };
 	expected(
@@ -505,6 +559,58 @@ test( '"this" selector', function() {
 	expected(
 		controls._triggerThisEvt, vals2,
 		'controls._triggerThisEvt should be {{_exp}}'
+	);
+	
+	
+	var vals3 = { _exp: 'change' };
+	expected(
+		oQuuxView._checkType1, vals3,
+		'oQuuxView._checkType1 should be {{_exp}}'
+	);
+	
+	var vals4 = { _exp: 'model' };
+	expected(
+		oQuuxView._checkNs1, vals4,
+		'oQuuxView._checkNs1 should be {{_exp}}'
+	);
+	
+	
+	var vals5 = { _exp: 'change:foo' };
+	expected(
+		oQuuxView._checkType2, vals5,
+		'oQuuxView._checkType2 should be {{_exp}}'
+	);
+	
+	var vals6 = { _exp: 'model' };
+	expected(
+		oQuuxView._checkNs2, vals6,
+		'oQuuxView._checkNs2 should be {{_exp}}'
+	);
+	
+	
+	var vals7 = { _exp: 'change' };
+	expected(
+		oQuuxView._checkType3, vals7,
+		'oQuuxView._checkType3 should be {{_exp}}'
+	);
+	
+	var vals8 = { _exp: 'data.some' };
+	expected(
+		oQuuxView._checkNs3, vals8,
+		'oQuuxView._checkNs3 should be {{_exp}}'
+	);
+	
+	
+	var vals9 = { _exp: 'change:baz' };
+	expected(
+		oQuuxView._checkType4, vals9,
+		'oQuuxView._checkType4 should be {{_exp}}'
+	);
+	
+	var vals10 = { _exp: 'data.some' };
+	expected(
+		oQuuxView._checkNs4, vals10,
+		'oQuuxView._checkNs4 should be {{_exp}}'
 	);
 	
 	

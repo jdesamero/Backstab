@@ -8,12 +8,14 @@ expected = function( actualRes, params, msg ) {
 	params._act = actualRes;
 	
 	if ( actualRes === expectedRes ) {
-		suffix = ' (result: ' + actualResStr + ')';	
+		suffix = ' (result: %s)'.printf( actualResStr );	
 	}
 	
 	$.each( params, function( k, v ) {
-		msg = msg.replace( '{{' + k + '}}', _.stringify( v ) );
+		msg = msg.replace( '{{%s}}'.printf( k ), _.stringify( v ) );
 	} );
 	
-	equal( actualRes, expectedRes, msg + suffix );
+	equal( actualRes, expectedRes, '%s%s'.printf( msg, suffix ) );
+	
 };
+

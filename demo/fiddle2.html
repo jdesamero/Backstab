@@ -22,6 +22,23 @@
 	<script src="../backstab/view.js" type="text/javascript"></script>
 	
 	
+	<style type="text/css">
+		
+		#otherview, #plain {
+			width: 200px;
+			height: 150px;
+		}
+		
+		#otherview {
+			background-color: aquamarine;
+		}
+		
+		#plain {
+			background-color: salmon;
+		}
+		
+	</style>
+	
 	<script type="text/javascript">
 		
 		
@@ -140,6 +157,28 @@
 			
 		} );
 		
+		
+		
+		var OtherView = Backstab.View.extend( {
+			
+			events: {
+				'click': 'doStuff',
+				'reveal this': 'smellFoot'
+			},
+			
+			doStuff: function( e ) {
+				var sTagName = $( e.target ).prop( 'tagName' );
+				alert( 'stuff was done... %s'.printf( sTagName ) );
+			},
+			
+			smellFoot: function() {
+			
+			}
+			
+			
+		} );
+		
+		
  		//// execute
 		
 		jQuery( document ).ready( function( $ ) {
@@ -180,6 +219,21 @@
 			
 			oSong.set( 'song', 'Foo It...' );
 			
+			
+			// -------------------------------------------------------------------------------------
+			
+			
+			var oOtherView = new OtherView( {
+				el: $( '#otherview' )
+			} );
+			
+			
+			$( '#plain' ).on( 'click', function( e ) {
+				var sTagName = $( e.target ).prop( 'tagName' );
+				alert( 'plain stuff was done... %s'.printf( sTagName ) );			
+			} );
+			
+			
 		} );
 		
 	</script>
@@ -194,6 +248,24 @@
 <hr />
 
 <div id="someview"></div>
+
+<div id="otherview">
+	<a href="#" id="link1">Link 1</a>
+	<a href="#" id="link2">Link 2</a>
+	<div>
+		<a href="#" id="link3">Link 3</a>
+	</div>
+</div>
+
+
+<div id="plain">
+	<a href="#" id="link1">Link 1</a>
+	<a href="#" id="link2">Link 2</a>
+	<div>
+		<a href="#" id="link3">Link 3</a>
+	</div>
+</div>
+
 
 </body>
 
