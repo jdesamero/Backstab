@@ -304,10 +304,14 @@
 				
 				var eList2 = $( '#list2' );
 				
+				if ( eList2.find( 'a.addsong' ).length ) {
+					eList2.append( '<hr />' );
+				}
+				
 				eList2.append( oNewAddButton.render().$el );
 				eList2.append( '<br />' );
 				eList2.append( oNewAlbumView.render().$el );
-				eList2.append( '<hr />' );
+				
 				
 				return false;			
 			},
@@ -447,8 +451,7 @@
 
 <div class="ext_controls">
 	<a href="#" id="new_list">New List</a> | 
-	<a href="#" id="remove_test">Remove Test</a> | 
-	<a href="#" id="get_len">Get Length</a>
+	<a href="#" id="remove_test">Remove Test</a>
 </div>
 
 </body>
