@@ -57,6 +57,30 @@
 	<div id="bar"></div>
 	<div id="baz">Baz Baz</div>
 	<div id="quux"></div>
+	
+	<div id="createelem">This is a div.</div>
+	
+	<div id="extractmodelval">
+		<form id="extractmodelform">
+			<input type="text" id="textinput" />
+			<textarea id="textarea"></textarea>
+			<select id="selectmenu">
+				<option value="Opt1"></option>
+				<option value="Kangaroo"></option>
+				<option value="Cat"></option>
+			</select>
+			<span id="spantag"></span>
+			
+			<input type="text" class="textinput2" />
+			<textarea class="textarea2"></textarea>
+			<select class="selectmenu2">
+				<option value="Opt1"></option>
+				<option value="Owl"></option>
+				<option value="Gorilla"></option>
+			</select>
+			<span class="spantag2"></span>
+		</form>
+	</div>
 </div>
 
 <script src="../dependencies/qunit-1.15.0.js" type="text/javascript"></script>
@@ -343,6 +367,70 @@ var oQuuxView = new QuuxView( {
 oModel.set( { foo: 'bar' } );
 oDataModel.set( { baz: 'quux' } );
 
+//stacey's unit tests
+var CreateElementView = Backstab.View.extend( {
+	createElement: function() {
+		return $( '<h2>This is an H2.<\/h2>' );
+	}
+
+} );
+
+var oCreateElementView = new CreateElementView( {
+	el: $( '#createelem' )
+} );
+
+var oCreateElementView2 = new CreateElementView( {} );
+
+
+//---------------
+var FormModel = Backstab.Model.extend( {} );
+
+var oFormModel = new FormModel( { textinput: 'Aardvark', 
+								textarea: 'Baboon', 
+								selectmenu: 'Cat', 
+								spantag: 'Dog', 
+								textinput2: 'Elephant', 
+								textarea2: 'Ferret', 
+								selectmenu2: 'Gorilla', 
+								spantag2: 'Hippopotamus'  
+} );
+
+var FormView = Backstab.View.extend( {
+	initialize: function() {
+		if( this.model ) {
+			this.extractModelValues();
+		}
+	
+	}
+} );
+
+var oFormView = new FormView({
+	model: oFormModel,
+	el: $( '#extractmodelval' )
+});
+
+
+
+var oFormModel2 = new FormModel( { textinput: 'Ibex', 
+								textarea: 'Jaguar', 
+								selectmenu: 'Kangaroo', 
+								spantag: 'Llama', 
+								textinput2: 'Mammoth', 
+								textarea2: 'Nine Headed Lion Beast', 
+								selectmenu2: 'Owl', 
+								spantag2: 'Parrot'  
+} );
+
+var clone = $( '#extractmodelval' ).clone();
+$( '.hide' ).append( clone );
+clone.attr( 'id', 'extractmodelval2' );
+
+var oFormView2 = new FormView({
+	el: $( '#extractmodelval2' )
+});
+
+oFormView2.extractModelValues( oFormModel2 );
+
 /* ---------------------------------------------------------------------------------------------- */
 
 test( 'new Backstab.View', function() {
@@ -616,6 +704,131 @@ test( '"this" selector', function() {
 	
 } );
 
+test( 'oView.createElement()', function() {
+	
+	expect( 3 );
+	
+	var vals1 = { _exp: 'This is a div.' };
+	expected(
+		oCreateElementView.$el.html(), vals1,
+		'oCreateElementView.$el.html() should be {{_exp}}'
+	);
+	
+	var vals2 = { _exp: 'H2' };
+	expected(
+		oCreateElementView2.$el.prop( 'tagName' ), vals2,
+		'oCreateElementView2.$el.prop( "tagName" ) should be {{_exp}}'
+	);
+	
+	var vals3 = { _exp: 'This is an H2.' };
+	expected(
+		oCreateElementView2.$el.html(), vals3,
+		'oCreateElementView2.$el.html() should be {{_exp}}'
+	);
+	
+} );
+
+
+test( 'oView.extractModelValues()', function() {
+	
+	expect( 16 );
+	
+	var vals1 = { _exp: 'Aardvark' };
+	expected(
+		oFormView.$( '#textinput' ).val(), vals1,
+		'oFormView.$( "#textinput" ).val() should be {{_exp}}'
+	);
+	
+	var vals2 = { _exp: 'Baboon' };
+	expected(
+		oFormView.$( '#textarea' ).val(), vals2,
+		'oFormView.$( "#textarea" ).val() should be {{_exp}}'
+	);
+	
+	var vals3 = { _exp: 'Cat' };
+	expected(
+		oFormView.$( '#selectmenu' ).val(), vals3,
+		'oFormView.$( "#selectmenu" ).val() should be {{_exp}}'
+	);
+	
+	var vals4 = { _exp: 'Dog' };
+	expected(
+		oFormView.$( '#spantag' ).html(), vals4,
+		'oFormView.$( "#spantag" ).html() should be {{_exp}}'
+	);
+	
+	var vals5 = { _exp: 'Elephant' };
+	expected(
+		oFormView.$( '.textinput2' ).val(), vals5,
+		'oFormView.$( ".textinput2" ).val() should be {{_exp}}'
+	);
+	
+	var vals6 = { _exp: 'Ferret' };
+	expected(
+		oFormView.$( '.textarea2' ).val(), vals6,
+		'oFormView.$( ".textarea2" ).val() should be {{_exp}}'
+	);
+	
+	var vals7 = { _exp: 'Gorilla' };
+	expected(
+		oFormView.$( '.selectmenu2' ).val(), vals7,
+		'oFormView.$( ".selectmenu2" ).val() should be {{_exp}}'
+	);
+	
+	var vals8 = { _exp: 'Hippopotamus' };
+	expected(
+		oFormView.$( '.spantag2' ).html(), vals8,
+		'oFormView.$( ".spantag2" ).html() should be {{_exp}}'
+	);
+	
+	var vals9 = { _exp: 'Ibex' };
+	expected(
+		oFormView2.$( '#textinput' ).val(), vals9,
+		'oFormView2.$( "#textinput" ).val() should be {{_exp}}'
+	);
+	
+	var vals10 = { _exp: 'Jaguar' };
+	expected(
+		oFormView2.$( '#textarea' ).val(), vals10,
+		'oFormView2.$( "#textarea" ).val() should be {{_exp}}'
+	);
+	
+	var vals11 = { _exp: 'Kangaroo' };
+	expected(
+		oFormView2.$( '#selectmenu' ).val(), vals11,
+		'oFormView2.$( "#selectmenu" ).val() should be {{_exp}}'
+	);
+	
+	var vals12 = { _exp: 'Llama' };
+	expected(
+		oFormView2.$( '#spantag' ).html(), vals12,
+		'oFormView2.$( "#spantag" ).html() should be {{_exp}}'
+	);
+	
+	var vals13 = { _exp: 'Mammoth' };
+	expected(
+		oFormView2.$( '.textinput2' ).val(), vals13,
+		'oFormView2.$( ".textinput2" ).val() should be {{_exp}}'
+	);
+	
+	var vals14 = { _exp: 'Nine Headed Lion Beast' };
+	expected(
+		oFormView2.$( '.textarea2' ).val(), vals14,
+		'oFormView2.$( ".textarea2" ).val() should be {{_exp}}'
+	);
+	
+	var vals15 = { _exp: 'Owl' };
+	expected(
+		oFormView2.$( '.selectmenu2' ).val(), vals15,
+		'oFormView2.$( ".selectmenu2" ).val() should be {{_exp}}'
+	);
+	
+	var vals16 = { _exp: 'Parrot' };
+	expected(
+		oFormView2.$( '.spantag2' ).html(), vals16,
+		'oFormView2.$( ".spantag2" ).html() should be {{_exp}}'
+	);
+} );
 
 </script>
 
