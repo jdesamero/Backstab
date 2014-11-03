@@ -81,6 +81,28 @@
 			<span class="spantag2"></span>
 		</form>
 	</div>
+	
+	<div id="setmodelval">
+		<form id="setmodelform">
+			<input type="text" id="textinput3" value="Text field ID." />
+			<textarea id="textarea3">Textarea ID.</textarea>
+			<select id="selectmenu3">
+				<option value="Mouse"></option>
+				<option value="Kangaroo"></option>
+				<option value="Cat"></option>
+			</select>
+			<span id="spantag3">Span tag ID.</span>
+			
+			<input type="text" class="textinput4" value="Text field class." />
+			<textarea class="textarea4">Textarea class.</textarea>
+			<select class="selectmenu4">
+				<option value="Rat"></option>
+				<option value="Owl"></option>
+				<option value="Gorilla"></option>
+			</select>
+			<span class="spantag4">Span tag class.</span>
+		</form>
+	</div>
 </div>
 
 <script src="../dependencies/qunit-1.15.0.js" type="text/javascript"></script>
@@ -430,6 +452,36 @@ var oFormView2 = new FormView({
 });
 
 oFormView2.extractModelValues( oFormModel2 );
+
+
+
+var GetValModel = Backstab.Model.extend( {
+	defaults: {
+		textinput3: '', 
+		textarea3: '', 
+		selectmenu3: '', 
+		spantag3: '', 
+		textinput4: '', 
+		textarea4: '', 
+		selectmenu4: '', 
+		spantag4: ''
+	}
+} );
+
+var oGetValModel = new GetValModel( {} );
+
+var GetValView = Backstab.View.extend( {
+	initialize: function() {
+		if( this.model ) {
+			this.setModelValues();
+		}
+	}
+} );
+
+var oGetValView = new GetValView( {
+	model: oGetValModel,
+	el: $( '#setmodelval' )
+} );
 
 /* ---------------------------------------------------------------------------------------------- */
 
@@ -828,6 +880,61 @@ test( 'oView.extractModelValues()', function() {
 		oFormView2.$( '.spantag2' ).html(), vals16,
 		'oFormView2.$( ".spantag2" ).html() should be {{_exp}}'
 	);
+	
+} );
+	
+test( 'oView.setModelValues()', function() {
+	
+	expect( 8 );
+	
+	var vals1 = { _exp: 'Text field ID.' };
+	expected(
+		oGetValView.$( '#textinput3' ).val(), vals1,
+		'oGetValView.$( "#textinput3" ).val() should be {{_exp}}'
+	);
+	
+	var vals2 = { _exp: 'Textarea ID.' };
+	expected(
+		oGetValView.$( '#textarea3' ).html(), vals2,
+		'oGetValView.$( "#textarea3" ).html() should be {{_exp}}'
+	);
+	
+	var vals3 = { _exp: 'Mouse' };
+	expected(
+		oGetValView.$( '#selectmenu3' ).val(), vals3,
+		'oGetValView.$( "#selectmenu3" ).val() should be {{_exp}}'
+	);
+	
+	var vals4 = { _exp: 'Span tag ID.' };
+	expected(
+		oGetValView.$( '#spantag3' ).html(), vals4,
+		'oGetValView.$( "#spantag3" ).html() should be {{_exp}}'
+	);
+	
+	var vals5 = { _exp: 'Text field class.' };
+	expected(
+		oGetValView.$( '.textinput4' ).val(), vals5,
+		'oGetValView.$( ".textinput4" ).val() should be {{_exp}}'
+	);
+	
+	var vals6 = { _exp: 'Textarea class.' };
+	expected(
+		oGetValView.$( '.textarea4' ).html(), vals6,
+		'oGetValView.$( ".textarea4" ).html() should be {{_exp}}'
+	);
+	
+	var vals7 = { _exp: 'Rat' };
+	expected(
+		oGetValView.$( '.selectmenu4' ).val(), vals7,
+		'oGetValView.$( ".selectmenu4" ).val() should be {{_exp}}'
+	);
+	
+	var vals8 = { _exp: 'Span tag class.' };
+	expected(
+		oGetValView.$( '.spantag4' ).html(), vals8,
+		'oGetValView.$( ".spantag4" ).html() should be {{_exp}}'
+	);
+	
 } );
 
 </script>
