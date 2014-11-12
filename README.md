@@ -10,8 +10,10 @@ Index
 - ``Backstab.Dispatcher``. Provides a way for views to communicate without directly referencing each other.
 - ``Backstab.StateMachine``. A state machine that provides Backbone.js-style functionality.
 - ``Backstab.Foo``. An example sub-class that can be used as a guideline for creating your own Backstab sub-classes.
+- ``Backstab.family``. Groups a family of models, collections, and views under one namespace.
 - ``Backstab`` (Core). The main Backstab object provides the namespace for the various Backstab sub-classes. It also offers loading/override functionality if you want to use the standard Backbone namespace.
 - ``Backstab`` (Underscore.js Enhancements). Backstab adds some more utility functions to the Underscore.js namespace.
+- Backstab Special Methods: ``createElement()``, ``extractModelValues()``, ``setModelValues()``
 
 
 Backstab.View
@@ -431,6 +433,129 @@ oFoo.foo( 'Yay' );
 Backstab.family
 --------------
 
+`Backstab.family` creates an object which links together related Backbone objects. The standard `Backstab.family` object has a `model`, `collection`, `itemView`, `listView`, and `formView`. This is implemented to help group your code together in a much more organized and understanable way - keeping all related models, views, and collections grouped together. The family can be thought of as a namespace.
+
+Boilerplate for a standard family:
+```javascript
+var Example = Backstab.family( {
+	name: 'example',
+	
+	enableLocalDispatcher: true,
+	
+	model: {
+		extend: {
+			// defaults
+		}
+	},
+	
+	itemView: {
+		extend: {
+			events: {
+				// events
+			},
+			createElement: function() {
+				//designate element
+			}
+		}
+	},
+	
+	listView: {
+		extend: {
+			// tagName, etc.
+		}
+	},
+	
+	formView: {
+		extend: {
+			events: {
+				// events
+			},
+			initialize: function() {
+				// code for initialize method
+			},
+			// etc
+		}
+	}
+} );
+```
+
+
+**_Instantiation_**
+
+Models, views, and collections are no longer given individual variable names. Instead, all Backbone object constructors are declared within the `Backstab.family` namespace variable (in this instance, `var Example`). Thus, when instantiating an object outside the family constructor, you would now use the format of `Namespace.Object`:
+
+```javascript
+var oAnimal = new Example.Model( {} );
+var oZoo = new Example.Collection( {} );
+var oZooView = new Example.ListView( {} );
+// etc.
+```
+
+
+**_Extend_**
+
+The `extend` method is now called within the declaration for the model or view, and all other methods (`defaults`, `events`, `initialize`, etc.) are then called within `extend`.
+
+
+**_Dispatcher_**
+
+When creating a family, you can set the `enableLocalDispatcher` method to 'true'. This will create a `localDispatcher` for all members of the family. When delegating the dispatcher to trigger a method, the only thing you will do differently is to reference `this.localDispatcher`, rather than the standard `this.dispatcher` (as is used for a global dispatcher). Likewise, when declaring the method in the `events` hash, `dispatcher` must be replaced with `localDispatcher`:
+
+
+```javascript
+// Without Family
+'dispatcher:someMethod this': 'doThis'
+
+// With Family
+'localDispatcher:someMethod': 'doThis'
+```
+
+The only catch is that since the dispatcher is no longer global, objects outside the family will have no knowledge of a family's `localDispatcher` unless explicitly given in the instantiation of the outside object:
+
+```javascript
+var oNewButton = new ControlsView( {
+	data: {
+		exampleDispatcher: oZooView.localDispatcher
+	}
+} );
+```
+
+Here you simply create a name for the localDispatcher (convention says to use the 'name' you provided when creating the family, suffixed with 'Dispatcher'), and associate it with the instance of a member of that family within the data hash. 
+
+When referring to a family's localDispatcher from the constructor of an object outside of the family, use the name you gave the dispatcher when you instantiated the object, prefixed by 'data'.
+
+```javascript
+// When Defining an Event
+doThis: function() {
+	this.data.exampleDispatcher.trigger( // what to do );
+}
+```
+
+
+**_Collections_**
+
+`Backstab.family` takes care of creating the collection and linking it with the family's model for you. You still instantiate it the same way as before, but you no longer need to create a constructor for it.
+
+
+**_Backbone Special Events_**
+
+As well as taking care of collection creation in the background, `Backstab.family` also handles Backbone's special events (`add`, `change`, `destroy`). There is no longer any need to declare or bind these to your custom events. Therefore, calling `this.model.destroy()` or `this.model.add()` in your custom events will automatically call `destroy` and `add`, respectively. Any change to the model (ex. via `extractModelValues()` or `setModelValues()`) will trigger `change`.
+
+
+**_Initialize_**
+
+`Backstab.family` also takes care of the `initialize` method in the background if it is not declared in the constructor. This also means that, like `add/change/destroy`, you no longer need to declare it in the events hash.
+
+
+**_Params_**
+
+`Backstab.family` also provides a `params` method for specific configuration of your objects. They can be used to override `Backstab.family`'s default functionality. Specific parameters can be found in `backstab/family.js`. The `params` hash is declared on the same level as `extend`.
+
+
+
+Backstab.family
+--------------
+
 The `Backstab.family()` function creates a family of related models, collections, and views in one namespace.
 
 HTML
@@ -520,6 +645,94 @@ The following functions are added:
 The following functions are overloaded, original functionality should not be affected:
 
 - ``_.contains( subject, value )``. _&lt;content to come&gt;_
+
+
+
+Backstab Special Methods
+-------------------------
+
+**_createElement()_**
+
+`createElement()` can be used in place of assigning an existing or new DOM element to a view's el in the `initialize` method. `createElement()` creates a brand new element for each instance of the view, so cloning/copying the element is not necessary.
+
+```javascript
+// Backbone
+initialize: function() {
+	this.$el = $( '#element' );
+	// or
+	this.$el = $( '<a href="#">Click Me</a>' );
+	// or
+	this.$el = $( '#article-tmpl' ).tmpl( {} );
+}
+
+// Backstab
+createElement: function() {
+	return $( '#element' );
+	// or
+	return $( '<a href="#">Click Me</a>' );
+	// ir
+	return $( '#article-tmpl' ).tmpl( {} );
+}
+```
+
+
+
+**_extractModelValues( oModel, eElem, oParams )_**
+
+The `extractModelValues()` method allows you to assign model values to DOM elements in a succinct, 'DRY' manner.
+
+With vanilla Backbone, assigning model values to a DOM element would look like so:
+
+```javascript
+this.$el.find( '.title' ).html( this.model.get( 'title' );
+this.$el.find( '.author' ).html( this.model.get( 'author' );
+this.$el.find( '.date' ).html( this.model.get( 'date' );
+```
+
+There's a lot of repetition there and it has to potential to grow cumbersome the more elements you need to assign values to.
+
+Using Backstab, this process can be reduced to on line:
+
+```javascript
+this.extractModelValues();
+```
+
+The only catch here is that the elements you want to assign values to must have a class or ID which matches the title of the model attribute _exactly_. Ie. The model's `title` attribute will ONLY pair itself with an element with a class or ID of `title`. It will first search for a matching class, and, if it does not find one will pair itself with a matching ID. Thus, be mindful with your element ID and class names.
+
+`extractModelValues()` takes several argumens: `oModel`, `eElem`, `oParams`
+`oModel` - A different model than the one assigned to the view can be used by passing the outside model as the first argument. If no argument is passed, then `this.model` is assumed (with `this` referring to the view).
+`eElem` - Likewise, a different element than `$el` can be used by passing the desired element as the second argument. If no argument is passed, then `this.$el` is assumed (again, with `this` referring to the view).
+`oParams` - Content to come.
+
+
+
+**_setModelValues( oModel, eElem, oParams, oFields )_**
+
+`setModelValues()` works in much the same way as `extractModelValues()`, but in reverse! Using `setModelValues()` will assign a DOM element's value to the matching model attribute.
+
+Just like with `extractModelValues()`, using `setModelValues()` vastly reduces your code:
+
+```javascript
+// Backbone
+article.set( {
+	'title': this.$el.find( '.title' ).val(),
+	'author': this.$el.find( '.author').val(),
+	'date': this.$el.find( '.date' ).val()
+} );
+
+// Backstab
+this.setModelValues( article );
+```
+
+The same rules apply here: the model will first look for a class that matches its attribute, and then will move on to an ID if it cannot find one. 
+
+One minor thing to note when using this method is that if the model is blank it must have defaults defined in order for it to know which fields to search for.
+
+`setModelValues()` takes several arguments: `oModel`, `eElem`, `oParams`, `oFields`
+The `oModel` and `eElem` arguments work exactly as above in `extractModelValues()`
+`oParams` - Content to come
+`oFields` - You can force the model to search for specific fields by passing them as the fourth argument. Content to come.
+
 
 
 Contact
