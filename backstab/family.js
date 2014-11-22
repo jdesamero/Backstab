@@ -34,15 +34,19 @@
 		return setupRes;
 	};
 	
-	var getTmplElem = function( vals, tmplName, bEsc ) {
-
+	var getTmplElem = function( vals, tmplName, bEsc, eTmpl ) {
+		
 		if ( !vals ) vals = {};
 		
+		if ( !eTmpl ) {
+			eTmpl = $( '#%s-tmpl'.printf( tmplName ) );
+		}
+		
 		if ( bEsc ) {
-			var sSrc = $.trim( $( '#%s-tmpl'.printf( tmplName ) ).html().replace( /\\\//g, '\/' ) );
+			var sSrc = $.trim( eTmpl.html().replace( /\\\//g, '\/' ) );
 			return $.tmpl( sSrc, vals );
 		} else {
-			return $( '#%s-tmpl'.printf( tmplName ) ).tmpl( vals );
+			return eTmpl.tmpl( vals );
 		}
 		
 	};
@@ -100,7 +104,19 @@
 			sElementPrefix = '%s_'.printf( opts.name );
 		}
 		
-		var ent = {};
+		var oFamily = {
+			
+			setData: function( oData ) {
+				
+				if ( !oFamily.data ) {
+					oFamily.data = {};
+				}
+				
+				_.extend( oFamily.data, oData );
+			}
+			
+		};
+		
 		
 		
 		
@@ -112,7 +128,7 @@
 			
 			var modelExt = {
 				
-				family: ent
+				family: oFamily
 				
 			};
 			
@@ -128,7 +144,7 @@
 				
 			} );
 			
-			ent.Model = Backstab.Model.extend( modelExt );			
+			oFamily.Model = Backstab.Model.extend( modelExt );			
 		}
 		
 		
@@ -142,9 +158,9 @@
 			
 			var collectionExt = {
 				
-				family: ent,
+				family: oFamily,
 				
-				model: ent.Model
+				model: oFamily.Model
 				
 			};
 			
@@ -176,7 +192,7 @@
 				
 			} );
 			
-			ent.Collection = Backstab.Collection.extend( collectionExt );
+			oFamily.Collection = Backstab.Collection.extend( collectionExt );
 		}
 		
 		
@@ -189,7 +205,7 @@
 			
 			var itemViewExt = {
 				
-				family: ent,
+				family: oFamily,
 				
 				events: {
 					'model:change this': 'updateItem',
@@ -198,8 +214,8 @@
 				
 				createElement: function() {
 					
-					if ( ent.itemTmpl ) {
-						return ent.itemTmpl.clone();
+					if ( oFamily.itemTmpl ) {
+						return oFamily.itemTmpl.clone();
 					}
 					
 					return this.getTmpl( this.getTmplInitVals() );
@@ -217,9 +233,17 @@
 					return {};
 				},
 				
-				getTmpl: function( vals, name ) {
+				getTmpl: function( vals, name, sSelector ) {
+					
 					if ( !name ) name = opts.name;
-					return getTmplElem( vals, name, opts.unescapeTemplateSrc );
+					
+					var eElem;
+					
+					if ( sSelector ) {
+						eElem = this.$( sSelector );
+					}
+					
+					return getTmplElem( vals, name, opts.unescapeTemplateSrc, eElem );
 				},
 				
 				updateItem: function( e, model ) {
@@ -274,7 +298,7 @@
 				
 			} );
 			
-			ent.ItemView = Backstab.View.extend( itemViewExt );
+			oFamily.ItemView = Backstab.View.extend( itemViewExt );
 		}
 		
 		
@@ -287,10 +311,10 @@
 			
 			var listViewExt = {
 				
-				family: ent,
+				family: oFamily,
 				
 				events: {
-					'collection:initialize this; collection:add this': 'appendItem'
+					'collection:{ initialize; add } this': 'appendItem'
 				},
 				
 				createElement: function() {
@@ -303,8 +327,8 @@
 
 						var eItemTmpl = this.$( lvPrms.itemTmplSelector );
 						
-						if ( !ent.itemTmpl ) {
-							ent.itemTmpl = eItemTmpl.clone();
+						if ( !oFamily.itemTmpl ) {
+							oFamily.itemTmpl = eItemTmpl.clone();
 						}
 						
 						eItemTmpl.remove();					
@@ -320,14 +344,22 @@
 					return {};
 				},
 				
-				getTmpl: function( vals, name ) {
+				getTmpl: function( vals, name, sSelector ) {
+					
 					if ( !name ) name = opts.namePlural;
-					return getTmplElem( vals, name, opts.unescapeTemplateSrc );
+					
+					var eElem;
+					
+					if ( sSelector ) {
+						eElem = this.$( sSelector );
+					}
+					
+					return getTmplElem( vals, name, opts.unescapeTemplateSrc, eElem );
 				},
 				
 				appendItem: function( e, model, collection, options ) {
 					
-					var item = new ent.ItemView( {
+					var item = new oFamily.ItemView( {
 						model: model,
 						data: {
 							listView: this
@@ -366,7 +398,7 @@
 				
 			} );
 			
-			ent.ListView = Backstab.View.extend( listViewExt );
+			oFamily.ListView = Backstab.View.extend( listViewExt );
 		}
 		
 		
@@ -379,11 +411,19 @@
 			
 			var formViewExt = {
 				
-				family: ent,
+				family: oFamily,
 				
-				getTmpl: function( vals, name ) {
+				getTmpl: function( vals, name, sSelector ) {
+					
 					if ( !name ) name = '%s_form'.printf( opts.name );
-					return getTmplElem( vals, name, opts.unescapeTemplateSrc );
+					
+					var eElem;
+					
+					if ( sSelector ) {
+						eElem = this.$( sSelector );
+					}
+					
+					return getTmplElem( vals, name, opts.unescapeTemplateSrc, eElem );
 				},
 				
 				initialize: function( options2 ) {
@@ -409,13 +449,21 @@
 				
 			} );
 			
-			ent.FormView = Backstab.View.extend( formViewExt );
+			oFamily.FormView = Backstab.View.extend( formViewExt );
 		}
 		
 		
-		// -----------------------------------------------------------------------------------------
+		// --- family ------------------------------------------------------------------------------
 		
-		return ent;
+		
+		
+		if ( opts.extend ) {
+			_.extend( oFamily, opts.extend );
+		}
+		
+		
+		
+		return oFamily;
 		
 	};
 	

@@ -1,0 +1,121 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    
+    <meta charset="UTF-8" />
+    <title>Backstab - Basic CRUD</title>
+	
+	<link href="../css/style.css" type="text/css" rel="stylesheet" media="screen" />
+	
+	<script src="../dependencies/jquery-1.11.1.min.js" type="text/javascript"></script>
+	<script src="../dependencies/underscore-1.7.0.min.js" type="text/javascript"></script>
+	<script src="../dependencies/backbone-1.1.2.min.js" type="text/javascript"></script>
+	
+	<script src="../dependencies/string_format.js" type="text/javascript"></script>
+	<script src="../dependencies/jquery.tmpl.js" type="text/javascript"></script>
+	
+	<script src="../backstab/underscore.js" type="text/javascript"></script>
+	<script src="../backstab/core.js" type="text/javascript"></script>
+	
+	<script src="../backstab/model.js" type="text/javascript"></script>
+	<script src="../backstab/collection.js" type="text/javascript"></script>
+	<script src="../backstab/view.js" type="text/javascript"></script>
+	<script src="../backstab/dispatcher.js" type="text/javascript"></script>
+	<script src="../backstab/family.js" type="text/javascript"></script>
+	<script src="../backstab/inspector.js" type="text/javascript"></script>
+	
+	
+	<style type="text/css">
+		
+		td, tr {
+			padding: 3px 12px;
+		}
+		
+	</style>
+	
+	<script type="text/javascript">
+		
+		
+		var Stuff = Backstab.family( {
+		
+		} );
+		
+		
+		
+		jQuery( document ).ready( function( $ ) {
+			
+			var oStuffs = new Stuff.Collection( [
+				{ 'id': 1, 'name': 'Apple', 'from': 'temperate' },
+				{ 'id': 2, 'name': 'Banana', 'from': 'tropics' },
+				{ 'id': 3, 'name': 'Mango', 'from': 'tropics' },
+				{ 'id': 4, 'name': 'Durian', 'from': 'tropics' },
+				{ 'id': 5, 'name': 'Pear', 'from': 'temperate' },
+				{ 'id': 6, 'name': 'Jackfruit', 'from': 'tropics' }
+			] );
+			
+			
+			var oTransStuffs = new Stuff.Collection();
+			
+			// transfer a model
+			
+			// var oSome = oStuffs.at( 1 );
+			// oStuffs.transfer( oSome, oTransStuffs );
+			
+			
+			// transfer by index
+			
+			// oStuffs.transfer( 0, oTransStuffs );
+			
+			
+			// transfer by where params
+			
+			// oStuffs.transfer( { 'from': 'temperate' }, oTransStuffs );
+			oStuffs.transfer( { 'from': 'tropics' }, oTransStuffs );
+			
+			// -------------------------------------------------------------------------------------
+			
+			var oThings = new Stuff.Collection( [
+				{ 'id': 101, 'name': "Domino's" },
+				{ 'id': 102, 'name': 'Burger King' },
+				{ 'id': 103, 'name': "Jack Astor's" },
+				{ 'id': 104, 'name': 'Taco Bell' }
+			] );
+			
+			var oTransThings = new Stuff.Collection();
+			
+			// transfer models on oThings to oTransThings
+			oThings.transfer( oTransThings );
+			
+			// -------------------------------------------------------------------------------------
+			
+			var oInspectorView = new Backstab.Inspector( {
+				data: {
+					collectionHash: {
+						
+						'stuff': { title: 'Stuffs', collection: oStuffs },
+						'transstuff': { title: 'Trans Stuffs', collection: oTransStuffs },
+						
+						'thing': { title: 'Things', collection: oThings },
+						'transthing': { title: 'Trans Things', collection: oTransThings }
+					}
+				}
+			} );
+			
+			$( 'div.inspect' ).append( oInspectorView.render().$el );
+			
+		} );
+		
+	</script>
+
+
+</head>
+
+<body>
+
+<h1>Inspect</h1>
+
+<div class="inspect"></div>
+
+</body>
+
+</html>

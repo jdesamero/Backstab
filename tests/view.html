@@ -264,9 +264,11 @@ var ControlsView = Backstab.View.extend( {
 		return false;
 	},
 	
-	thisAction: function( e ) {
+	thisAction: function( e, arg1, arg2 ) {
 		this._triggerThisRes = sTriggerThisMsg;
 		this._triggerThisEvt = e.type;
+		this._triggerArg1 = arg1;
+		this._triggerArg2 = arg2;
 	}
 	
 } );
@@ -306,7 +308,7 @@ var controls = new ControlsView( {
 
 var eCtl = controls.$el;
 
-controls.trigger( sTriggerThisEvt );
+controls.trigger( sTriggerThisEvt, 'Zoo', 'Zebra' );
 
 
 var sBarViewDataValue = 'Bar view data value...';
@@ -580,9 +582,7 @@ test( 'Backstab.View, Collection Events', function() {
 	
 } );
 
-module( 'Backstab.View, Enhanced Event Delegation' );
-
-test( 'Delegate Parameters', function() {
+test( 'Backstab.View, Enhanced Event Delegation, Delegate Parameters', function() {
 	
 	expect( 3 );
 	
@@ -612,7 +612,7 @@ test( 'Delegate Parameters', function() {
 		
 } );
 
-test( 'Dot Notation', function() {
+test( 'Backstab.View, Enhanced Event Delegation, Dot Notation', function() {
 	
 	var foo1Msg = 'foo1.baz is Fruits!';
 	foo1.baz( foo1Msg );
@@ -631,7 +631,7 @@ test( 'Dot Notation', function() {
 	
 } );
 
-test( 'Multiple delegates per method', function() {
+test( 'Backstab.View, Enhanced Event Delegation, Multiple delegates per method', function() {
 	
 	expect( 2 );
 	
@@ -655,7 +655,7 @@ test( 'Multiple delegates per method', function() {
 	
 } );
 
-test( 'Curly brace shorthand', function() {
+test( 'Backstab.View, Enhanced Event Delegation, Curly brace shorthand', function() {
 	
 	expect( 4 );
 	
@@ -685,9 +685,9 @@ test( 'Curly brace shorthand', function() {
 	
 } );
 
-test( '"this" selector', function() {
+test( 'Backstab.View, Enhanced Event Delegation, "this" selector', function() {
 	
-	expect( 10 );
+	expect( 12 );
 	
 	var vals1 = { _exp: sTriggerThisMsg };
 	expected(
@@ -753,6 +753,17 @@ test( '"this" selector', function() {
 		'oQuuxView._checkNs4 should be {{_exp}}'
 	);
 	
+	var vals11 = { _exp: 'Zoo' };
+	expected(
+		controls._triggerArg1, vals11,
+		'controls._triggerArg1 should be {{_exp}}'
+	);
+	
+	var vals12 = { _exp: 'Zebra' };
+	expected(
+		controls._triggerArg2, vals12,
+		'controls._triggerArg2 should be {{_exp}}'
+	);
 	
 } );
 
