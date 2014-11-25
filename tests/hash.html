@@ -1,0 +1,352 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    
+    <meta charset="UTF-8" />
+    <title>QUnit - backstab/hash.js</title>
+	
+	<link href="../css/qunit-1.15.0.css" rel="stylesheet" type="text/css" />
+	<link href="../css/style.css" rel="stylesheet" type="text/css" />
+	
+	<script src="../dependencies/jquery-1.11.1.min.js" type="text/javascript"></script>
+	<script src="../dependencies/underscore-1.7.0.min.js" type="text/javascript"></script>
+	<script src="../dependencies/backbone-1.1.2.min.js" type="text/javascript"></script>
+	
+	<script src="../dependencies/string_format.js" type="text/javascript"></script>
+	
+	<script src="../backstab/underscore.js" type="text/javascript"></script>
+	<script src="../backstab/core.js" type="text/javascript"></script>
+	
+	<script src="../backstab/generic.js" type="text/javascript"></script>
+	<script src="../backstab/hash.js" type="text/javascript"></script>
+	
+</head>
+
+<body>
+
+<p><a href="index.html">Main Menu</a></p>
+
+<div id="qunit"></div>
+<div id="qunit-fixture"></div>
+
+<script src="../dependencies/qunit-1.15.0.js" type="text/javascript"></script>
+<script src="funcs.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+
+var oDooDads = new Backstab.Hash( {
+	'foo': { name: 'Foot' },
+	'bar': { name: 'Bear' },
+	'baz': { name: 'Base' }
+} );
+
+var iLengthTest = oDooDads.length;
+
+var oBarMember = oDooDads.get( 'bar' );
+
+// test each()
+
+var sDooDadKeys = '';
+var sDooDadNames = '';
+
+oDooDads.each( function( sKey, oGen ) {
+	sDooDadKeys += '%s:'.printf( sKey );
+	sDooDadNames += '%s:'.printf( oGen.name );
+} );
+
+// test unset
+
+oDooDads.set( 'temp', { name: 'Temp' } );
+var bDooBeforeUnset = oDooDads.hasMember( 'temp' );
+
+oDooDads.unset( 'temp' );
+var bDooAfterUnset = oDooDads.hasMember( 'temp' );
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+var Widget = Backstab.Generic.extend( {
+	
+	getMyName: function() {
+		return 'myname:%s'.printf( this.params.name );
+	}
+	
+} );
+
+var Widgets = Backstab.Hash.extend( {
+	
+	member: Widget
+	
+} );
+
+
+var oWidgets = new Widgets( {
+	'apple': new Widget( { name: 'Apple' } ),
+	'banana': new Widget( { name: 'Banana' } ),
+	'orange': { name: 'Orange' },			// this works because of "member"
+	'pommes': 'apple',
+	'mango': { name: 'Mango' }
+}, {
+	'default': 'banana'
+} );
+
+var iLengthTest2 = oWidgets.length;
+
+var oBanana = oWidgets.get( 'banana' );
+var oOrange = oWidgets.get( 'orange' );
+var oPommes = oWidgets.get( 'pommes' );
+
+var oDefaultBogus = oWidgets.get( 'bad_key' );
+var oDefaultEmpty = oWidgets.get();
+
+
+// test each()
+
+var sWidgetKeys = '';
+var sWidgetNames = '';
+
+oWidgets.each( function( sKey, oGen ) {
+	sWidgetKeys += '%s:'.printf( sKey );
+	sWidgetNames += '%s:'.printf( oGen.get( 'name' ) );
+} );
+
+
+// test unset
+
+oWidgets.set( 'temp', { name: 'Temp' } );
+var bWidgetBeforeUnset = oWidgets.hasMember( 'temp' );
+
+oWidgets.unset( 'temp' );
+var bWidgetAfterUnset = oWidgets.hasMember( 'temp' );
+
+
+
+// detailed testing of alias
+
+var oStuffs = new Widgets( {
+	'red': { name: 'Red' },
+	'green': { name: 'Green' },
+	'blue': { name: 'Blue' },
+	'id101': 'red',
+	'id102': 'green',
+	'id103': 'blue'
+} );
+
+var bStuffCheck1 = oStuffs.hasMember( 'id101' );
+var iStuffCount1 = oStuffs.aliasLength;
+
+oStuffs.unset( 'id101' );
+
+var bStuffCheck2 = oStuffs.hasMember( 'id101' );
+var iStuffCount2 = oStuffs.aliasLength;
+
+oStuffs.unset( 'blue' );				// alias should be deleted as well
+
+var bStuffCheck3 = oStuffs.hasMember( 'id103' );
+
+/* ---------------------------------------------------------------------------------------------- */
+
+test( 'Backstab.Hash.extend', function() {
+	
+	expect( 2 );
+	
+	var vals1 = { _exp: 3 };
+	expected(
+		iLengthTest, vals1,
+		'iLengthTest should be {{_exp}}'
+	);
+	
+	// aliases not included in length
+	var vals2 = { _exp: 4 };
+	expected(
+		iLengthTest2, vals2,
+		'iLengthTest2 should be {{_exp}}'
+	);
+	
+} );
+
+
+test( 'oHash.get()', function() {
+	
+	expect( 5 );
+	
+	var vals1 = { _exp: 'Bear' };
+	expected(
+		oBarMember.name, vals1,
+		'oBarMember.name should be {{_exp}}'
+	);
+	
+	var vals2 = { _exp: 'Banana' };
+	expected(
+		oBanana.get( 'name' ), vals2,
+		"oBanana.get( 'name' ) should be {{_exp}}"
+	);
+	
+	var vals3 = { _exp: 'Orange' };
+	expected(
+		oOrange.get( 'name' ), vals3,
+		"oOrange.get( 'name' ) should be {{_exp}}"
+	);
+	
+	var vals4 = { _exp: 'Banana' };
+	expected(
+		oDefaultBogus.get( 'name' ), vals4,
+		"oDefaultBogus.get( 'name' ) should be {{_exp}}"
+	);
+	
+	var vals5 = { _exp: 'Banana' };
+	expected(
+		oDefaultEmpty.get( 'name' ), vals5,
+		"oDefaultEmpty.get( 'name' ) should be {{_exp}}"
+	);
+	
+	
+} );
+
+
+test( 'oHash.hasMember()', function() {
+	
+	expect( 4 );
+	
+	var vals1 = { _exp: true };
+	expected(
+		oDooDads.hasMember( 'foo' ), vals1,
+		"oDooDads.hasMember( 'foo' ) should be {{_exp}}"
+	);
+	
+	var vals2 = { _exp: false };
+	expected(
+		oDooDads.hasMember( 'bogus' ), vals2,
+		"oDooDads.hasMember( 'bogus' ) should be {{_exp}}"
+	);
+	
+	var vals3 = { _exp: true };
+	expected(
+		oWidgets.hasMember( 'apple' ), vals3,
+		"oWidgets.hasMember( 'apple' ) should be {{_exp}}"
+	);
+	
+	var vals4 = { _exp: false };
+	expected(
+		oWidgets.hasMember( 'bogus' ), vals4,
+		"oWidgets.hasMember( 'bogus' ) should be {{_exp}}"
+	);
+	
+} );
+
+test( 'oHash.each()', function() {
+	
+	expect( 4 );
+	
+	var vals1 = { _exp: 'foo:bar:baz:' };
+	expected(
+		sDooDadKeys, vals1,
+		'sDooDadKeys should be {{_exp}}'
+	);
+	
+	var vals2 = { _exp: 'Foot:Bear:Base:' };
+	expected(
+		sDooDadNames, vals2,
+		'sDooDadNames should be {{_exp}}'
+	);
+	
+	var vals3 = { _exp: 'apple:banana:orange:mango:' };
+	expected(
+		sWidgetKeys, vals3,
+		'sWidgetKeys should be {{_exp}}'
+	);
+	
+	var vals4 = { _exp: 'Apple:Banana:Orange:Mango:' };
+	expected(
+		sWidgetNames, vals4,
+		'sWidgetNames should be {{_exp}}'
+	);
+	
+} );
+
+test( 'oHash.unset()', function() {
+	
+	expect( 4 );
+	
+	var vals1 = { _exp: true };
+	expected(
+		bDooBeforeUnset, vals1,
+		'bDooBeforeUnset should be {{_exp}}'
+	);
+	
+	var vals2 = { _exp: false };
+	expected(
+		bDooAfterUnset, vals2,
+		'bDooAfterUnset should be {{_exp}}'
+	);
+	
+	var vals3 = { _exp: true };
+	expected(
+		bWidgetBeforeUnset, vals3,
+		'bWidgetBeforeUnset should be {{_exp}}'
+	);
+	
+	var vals4 = { _exp: false };
+	expected(
+		bWidgetAfterUnset, vals4,
+		'bWidgetAfterUnset should be {{_exp}}'
+	);
+	
+} );
+
+test( 'Backstab.Hash, Aliasing', function() {
+	
+	expect( 7 );
+	
+	// aliased value
+	var vals1 = { _exp: 'Apple' };
+	expected(
+		oPommes.get( 'name' ), vals1,
+		"oPommes.get( 'name' ) should be {{_exp}}"
+	);
+	
+	var vals2 = { _exp: 1 };
+	expected(
+		oWidgets.aliasLength, vals2,
+		'oWidgets.aliasLength should be {{_exp}}'
+	);
+	
+	var vals3 = { _exp: true };
+	expected(
+		bStuffCheck1, vals3,
+		'bStuffCheck1 should be {{_exp}}'
+	);
+	
+	var vals4 = { _exp: false };
+	expected(
+		bStuffCheck2, vals4,
+		'bStuffCheck2 should be {{_exp}}'
+	);
+	
+	var vals5 = { _exp: 3 };
+	expected(
+		iStuffCount1, vals5,
+		'iStuffCount1 should be {{_exp}}'
+	);
+	
+	var vals6 = { _exp: 2 };
+	expected(
+		iStuffCount2, vals6,
+		'iStuffCount2 should be {{_exp}}'
+	);
+	
+	var vals7 = { _exp: false };
+	expected(
+		bStuffCheck3, vals7,
+		'bStuffCheck3 should be {{_exp}}'
+	);
+	
+	
+} );
+
+
+
+</script>
+
+</body>
+
+</html>

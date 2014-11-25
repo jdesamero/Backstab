@@ -1,0 +1,150 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    
+    <meta charset="UTF-8" />
+    <title>Backstab - Basic CRUD</title>
+	
+	<link href="../css/style.css" type="text/css" rel="stylesheet" media="screen" />
+	
+	<script src="../dependencies/jquery-1.11.1.min.js" type="text/javascript"></script>
+	<script src="../dependencies/underscore-1.7.0.min.js" type="text/javascript"></script>
+	<script src="../dependencies/backbone-1.1.2.min.js" type="text/javascript"></script>
+	
+	<script src="../dependencies/string_format.js" type="text/javascript"></script>
+	<script src="../dependencies/jquery.tmpl.js" type="text/javascript"></script>
+	
+	<script src="../backstab/underscore.js" type="text/javascript"></script>
+	<script src="../backstab/core.js" type="text/javascript"></script>
+	
+	<script src="../backstab/model.js" type="text/javascript"></script>
+	<script src="../backstab/collection.js" type="text/javascript"></script>
+	<script src="../backstab/hash.js" type="text/javascript"></script>
+	<script src="../backstab/generic.js" type="text/javascript"></script>
+	<script src="../backstab/view.js" type="text/javascript"></script>
+	<script src="../backstab/dispatcher.js" type="text/javascript"></script>
+	<script src="../backstab/family.js" type="text/javascript"></script>
+	<script src="../backstab/inspector.js" type="text/javascript"></script>
+	
+	
+	<style type="text/css">
+		
+		td, tr {
+			padding: 3px 12px;
+		}
+		
+	</style>
+	
+	<script type="text/javascript">
+		
+		var Widget = Backstab.Generic.extend( {
+			
+			getMyName: function() {
+				return 'myname:%s'.printf( this.params.name );
+			},
+			
+			sayMyName: function() {
+				console.log( '------------- ' + this.params.name );
+			}
+			
+		} );
+		
+		var Widgets = Backstab.Hash.extend( {
+			
+			member: Widget,
+			
+			initialize: function() {
+				console.log( '----------------- fooo' );
+				console.log( arguments );
+			}
+			
+		} );
+		
+		jQuery( document ).ready( function( $ ) {
+			
+			var oWidgets = new Widgets( {
+				'apple': new Widget( { name: 'Apple' } ),
+				'banana': new Widget( { name: 'Banana' } ),
+				'orange': { name: 'Orange' },			// this works because of "member"
+				'pommes': 'apple',
+				'mango': { name: 'Mango' }
+			}, {
+				'default': 'banana'
+			} );
+			
+			console.log( '----------------- da len' );
+			console.log( oWidgets.length );
+			
+			// oWidgets.setDefault( 'banana' );
+			
+			
+			// get a member
+			
+			var oApple = oWidgets.get( 'apple' );
+			oApple.sayMyName();
+			
+			console.log( '----------------- consty...' );
+			console.log( $.isPlainObject( oApple ) );
+			
+			var oDaHool = { name: 'Dahool' };
+			console.log( $.isPlainObject( oDaHool ) );
+			
+			
+			// alias
+			console.log( '----------------- alias' );
+			var oPommes = oWidgets.get( 'pommes' );
+			oPommes.sayMyName();
+			
+			
+			
+			// get an auto-formatted member
+			console.log( '----------------- auto-format' );
+			
+			var oOrange = oWidgets.get( 'orange' );
+			oOrange.sayMyName();
+			
+			
+			// allow for default member if bogus key was set
+			
+			var oDefault = oWidgets.get( 'bogus' );
+			oDefault.sayMyName();
+			
+			
+			// hasMember
+			
+			console.log( '----------------- has member' );
+			console.log( oWidgets.hasMember( 'apple' ) );
+			console.log( oWidgets.hasMember( 'mango' ) );
+			
+			
+			
+			// each method
+			
+			console.log( '----------------- each' );
+			oWidgets.each( function( sKey, oGeneric ) {
+				console.log( '%s = %s'.printf( sKey, oGeneric.getMyName() ) );
+			} );
+			
+			// unset method
+			
+			console.log( '----------------- each' );
+			oWidgets.unset( 'mango' );
+			console.log( oWidgets.hasMember( 'mango' ) );
+			
+			
+		} );
+		
+	</script>
+
+
+</head>
+
+<body>
+
+<h1>Inspect</h1>
+
+<div class="inspect"></div>
+
+</body>
+
+</html>

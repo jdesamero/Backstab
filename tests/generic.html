@@ -1,0 +1,153 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    
+    <meta charset="UTF-8" />
+    <title>QUnit - backstab/generic.js</title>
+	
+	<link href="../css/qunit-1.15.0.css" rel="stylesheet" type="text/css" />
+	<link href="../css/style.css" rel="stylesheet" type="text/css" />
+	
+	<script src="../dependencies/jquery-1.11.1.min.js" type="text/javascript"></script>
+	<script src="../dependencies/underscore-1.7.0.min.js" type="text/javascript"></script>
+	<script src="../dependencies/backbone-1.1.2.min.js" type="text/javascript"></script>
+	
+	<script src="../dependencies/string_format.js" type="text/javascript"></script>
+	
+	<script src="../backstab/underscore.js" type="text/javascript"></script>
+	<script src="../backstab/core.js" type="text/javascript"></script>
+
+	<script src="../backstab/generic.js" type="text/javascript"></script>
+	
+</head>
+
+<body>
+
+<p><a href="index.html">Main Menu</a></p>
+
+<div id="qunit"></div>
+<div id="qunit-fixture"></div>
+
+<script src="../dependencies/qunit-1.15.0.js" type="text/javascript"></script>
+<script src="funcs.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+
+var oBar = new Backstab.Generic( {
+	candy: 'Twix',
+	maker: 'Hershey'
+} );
+
+oBar.set( 'type', 'Chocolate Bar' );
+
+var Foo = Backstab.Generic.extend( {
+	
+	getFoo: function() {
+		return 'foo:%s'.printf( this.params.foo );
+	}
+	
+} );
+
+var oFoo = new Foo( {
+	foo: 'Clowns',
+	baz: 'Elephants',
+	quux: 'Don Quixote'
+} );
+
+oFoo.set( 'baz', 'Lions' );
+
+
+var sBeforeUnsetVal = oFoo.get( 'quux' );
+oFoo.unset( 'quux' );
+
+var sAfterUnsetVal = oFoo.get( 'quux' );
+
+
+var sBeforeUnsetVal2 = oBar.get( 'maker' );
+oBar.unset( 'maker' );
+
+var sAfterUnsetVal2 = oBar.get( 'maker' );
+
+
+/* ---------------------------------------------------------------------------------------------- */
+
+test( 'new Backstab.Generic()', function() {
+	
+	expect( 1 );
+	
+	var vals1 = { _exp: 'Twix' };
+	expected(
+		oBar.get( 'candy' ), vals1,
+		"oBar.get( 'candy' ) should be {{_exp}}"
+	);
+	
+} );
+
+
+test( 'Backstab.Generic.extend', function() {
+	
+	expect( 1 );
+	
+	var vals1 = { _exp: 'foo:Clowns' };
+	expected(
+		oFoo.getFoo(), vals1,
+		'oFoo.getFoo() should be {{_exp}}'
+	);
+		
+} );
+
+test( 'oGeneric.set()', function() {
+	
+	expect( 2 );
+	
+	var vals1 = { _exp: 'Chocolate Bar' };
+	expected(
+		oBar.get( 'type' ), vals1,
+		"oBar.get( 'type' ) should be {{_exp}}"
+	);
+	
+	var vals2 = { _exp: 'Lions' };
+	expected(
+		oFoo.get( 'baz' ), vals2,
+		"oFoo.get( 'baz' ) should be {{_exp}}"
+	);
+	
+} );
+
+
+test( 'oGeneric.unset()', function() {
+	
+	expect( 4 );
+	
+	var vals1 = { _exp: 'Don Quixote' };
+	expected(
+		sBeforeUnsetVal, vals1,
+		"sBeforeUnsetVal should be {{_exp}}"
+	);
+	
+	var vals2 = { _exp: null };
+	expected(
+		sAfterUnsetVal, vals2,
+		"sAfterUnsetVal should be {{_exp}}"
+	);
+	
+	var vals3 = { _exp: 'Hershey' };
+	expected(
+		sBeforeUnsetVal2, vals3,
+		"sBeforeUnsetVal2 should be {{_exp}}"
+	);
+	
+	var vals4 = { _exp: null };
+	expected(
+		sAfterUnsetVal2, vals4,
+		"sAfterUnsetVal2 should be {{_exp}}"
+	);
+	
+} );
+
+
+</script>
+
+</body>
+
+</html>
