@@ -148,3 +148,90 @@ events: {
 }
 
 ```
+
+
+
+Backstab.View Special Methods
+------------------------------
+
+**_createElement()_**
+
+`createElement()` can be used in place of assigning an existing or new DOM element to a view's el in the `initialize` method. `createElement()` creates a brand new element for each instance of the view, so cloning/copying the element is not necessary.
+
+```javascript
+// Backbone
+initialize: function() {
+	this.$el = $( '#element' );
+	// or
+	this.$el = $( '<a href="#">Click Me</a>' );
+	// or
+	this.$el = $( '#article-tmpl' ).tmpl( {} );
+}
+
+// Backstab
+createElement: function() {
+	return $( '#element' );
+	// or
+	return $( '<a href="#">Click Me</a>' );
+	// ir
+	return $( '#article-tmpl' ).tmpl( {} );
+}
+```
+
+
+
+**_extractModelValues( oModel, eElem, oParams )_**
+
+The `extractModelValues()` method allows you to assign model values to DOM elements in a succinct, 'DRY' manner.
+
+With vanilla Backbone, assigning model values to a DOM element would look like so:
+
+```javascript
+this.$el.find( '.title' ).html( this.model.get( 'title' );
+this.$el.find( '.author' ).html( this.model.get( 'author' );
+this.$el.find( '.date' ).html( this.model.get( 'date' );
+```
+
+There's a lot of repetition there and it has to potential to grow cumbersome the more elements you need to assign values to.
+
+Using Backstab, this process can be reduced to on line:
+
+```javascript
+this.extractModelValues();
+```
+
+The only catch here is that the elements you want to assign values to must have a class or ID which matches the title of the model attribute _exactly_. Ie. The model's `title` attribute will ONLY pair itself with an element with a class or ID of `title`. It will first search for a matching class, and, if it does not find one will pair itself with a matching ID. Thus, be mindful with your element ID and class names.
+
+`extractModelValues()` takes several argumens: `oModel`, `eElem`, `oParams`
+`oModel` - A different model than the one assigned to the view can be used by passing the outside model as the first argument. If no argument is passed, then `this.model` is assumed (with `this` referring to the view).
+`eElem` - Likewise, a different element than `$el` can be used by passing the desired element as the second argument. If no argument is passed, then `this.$el` is assumed (again, with `this` referring to the view).
+`oParams` - Content to come.
+
+
+
+**_setModelValues( oModel, eElem, oParams, oFields )_**
+
+`setModelValues()` works in much the same way as `extractModelValues()`, but in reverse! Using `setModelValues()` will assign a DOM element's value to the matching model attribute.
+
+Just like with `extractModelValues()`, using `setModelValues()` vastly reduces your code:
+
+```javascript
+// Backbone
+article.set( {
+	'title': this.$el.find( '.title' ).val(),
+	'author': this.$el.find( '.author').val(),
+	'date': this.$el.find( '.date' ).val()
+} );
+
+// Backstab
+this.setModelValues( article );
+```
+
+The same rules apply here: the model will first look for a class that matches its attribute, and then will move on to an ID if it cannot find one. 
+
+One minor thing to note when using this method is that if the model is blank it must have defaults defined in order for it to know which fields to search for.
+
+`setModelValues()` takes several arguments: `oModel`, `eElem`, `oParams`, `oFields`
+The `oModel` and `eElem` arguments work exactly as above in `extractModelValues()`
+`oParams` - Content to come
+`oFields` - You can force the model to search for specific fields by passing them as the fourth argument. Content to come.
