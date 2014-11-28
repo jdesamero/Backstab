@@ -200,12 +200,25 @@ Using Backstab, this process can be reduced to on line:
 this.extractModelValues();
 ```
 
-The only catch here is that the elements you want to assign values to must have a class or ID which matches the title of the model attribute _exactly_. Ie. The model's `title` attribute will ONLY pair itself with an element with a class or ID of `title`. It will first search for a matching class, and, if it does not find one will pair itself with a matching ID. Thus, be mindful with your element ID and class names.
+The only catch here is that the elements you want to assign values to must have a class or ID which matches the title of the model attribute _exactly_. Ie. The model's `title` attribute will ONLY pair itself with an element with a class or ID of  `title`. It will first search for a matching class, and, if it does not find one will pair itself with a matching ID. Thus, be mindful with your element ID and class names.
 
-`extractModelValues()` takes several argumens: `oModel`, `eElem`, `oParams`
-`oModel` - A different model than the one assigned to the view can be used by passing the outside model as the first argument. If no argument is passed, then `this.model` is assumed (with `this` referring to the view).
+`extractModelValues()` takes several arguments: `oModel`, `eElem`, `oParams`
+
+`oModel` - A different model than the one assigned to the view can be used by passing the external model as the first argument. If no argument is passed, then `this.model` is assumed (with `this` referring to the view).
+
 `eElem` - Likewise, a different element than `$el` can be used by passing the desired element as the second argument. If no argument is passed, then `this.$el` is assumed (again, with `this` referring to the view).
-`oParams` - Content to come.
+
+`oParams` - The `oParams` argument allows you to apply specific parameters to a model attribute.  Provide `oParams` with a key for the attribute you want to apply parameters to, and give it values for any or all of the following: `selector`, `contents`, `defer`. `oParams` is defined on the same level as `initialize`:
+
+```javascript
+oParams: {
+	title: { // key matching attribute to apply params to
+		selector: // choose a selector for the attribute,
+		contents: // define the contents of the attribute,
+		defer: // allows you to defer the data for this attribute from loading
+	}
+}
+```
 
 
 
@@ -232,6 +245,9 @@ The same rules apply here: the model will first look for a class that matches it
 One minor thing to note when using this method is that if the model is blank it must have defaults defined in order for it to know which fields to search for.
 
 `setModelValues()` takes several arguments: `oModel`, `eElem`, `oParams`, `oFields`
-The `oModel` and `eElem` arguments work exactly as above in `extractModelValues()`
-`oParams` - Content to come
-`oFields` - You can force the model to search for specific fields by passing them as the fourth argument. Content to come.
+
+The `oModel`, `eElem`, and `oParams` arguments work exactly as above in `extractModelValues()`
+
+`oFields` - You can force the model to search for specific fields by passing them as the fourth argument. This is an alternate method for defining the defaults for a models attributes.
+
+
