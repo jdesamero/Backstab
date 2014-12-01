@@ -52,16 +52,9 @@
 	
 	Backstab.setNamespace( 'Model', Backbone.Model.extend( {
 		
-		data: null,
-		
 		constructor: function() {
 			
-			if ( this.data ) {
-				// make a copy
-				this.data = Object.create( this.data );
-			} else {
-				this.data = {};				
-			}
+			this.sharedSetup();					// from Backstab.Shared
 			
 			
 			// modify instance properties
@@ -127,6 +120,13 @@
 		
 	} ) );
 	
+	
+	// mix-in Backstab.Shared
+	$.extend( Backstab.Model.prototype, Backstab.Shared );
+	
+	
+	
+	//// class methods
 	
 	var oStaticProps = {
 		

@@ -152,6 +152,9 @@
 		
 		constructor: function() {
 			
+			this.sharedSetup();					// from Backstab.Shared
+			
+			
 			// modify instance properties
 			Backstab.View.modifyProps( this );
 			
@@ -356,8 +359,13 @@
 	} ) );
 	
 	
+	// mix-in Backstab.Shared
+	$.extend( Backstab.View.prototype, Backstab.Shared );
 	
-	// static properties	
+	
+	
+	//// class methods
+	
 	var oStaticProps = {
 		
 		//// properties

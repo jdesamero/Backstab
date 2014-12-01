@@ -29,6 +29,7 @@
 			console.log( 'other stuff... ' + this._param );
 		};
 		
+		
 		jQuery( document ).ready( function( $ ) {			
 			
 			var oFoo = new Foo( 'aaa' );
@@ -39,8 +40,32 @@
 		} );
 		
 	</script>
-
-
+	
+	<!-- test object create -->
+	
+	<script type="text/javascript">
+		
+		var oNested = {
+			nested: 'I am nested'
+		};
+		
+		var oSome = {
+			id: 10101,
+			name: 'Some foo',
+			nested: oNested
+		};
+		
+		var oCopy = Object.create( oSome );
+		
+		oCopy.id = 485495;
+		
+		oNested.nested = 'Change this';
+		
+		console.log( oCopy );
+		console.log( oSome );
+		
+	</script>
+	
 </head>
 
 <body>

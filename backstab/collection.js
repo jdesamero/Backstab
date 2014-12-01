@@ -24,6 +24,9 @@
 		
 		constructor: function() {
 			
+			this.sharedSetup();					// from Backstab.Shared
+			
+			
 			Backstab.Util.mergeValues( 'data', this, arguments[ 1 ] );
 			
 			this.on( 'add', this.lengthChanged );
@@ -271,6 +274,11 @@
 		
 		
 	} ) );
+	
+	
+	// mix-in Backstab.Shared
+	$.extend( Backstab.Collection.prototype, Backstab.Shared );
+	
 	
 	
 } ).call( this );
