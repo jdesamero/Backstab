@@ -16,19 +16,21 @@
 	
 	
 	
-	// add new methods and properties
-	var oOpts = {
+	//// main
+	
+	Backstab.setNamespace( 'Collection', Backbone.Collection.extend( {
 		
 		_prevLen: null,
 		
-		beforeInit: function() {
+		constructor: function() {
 			
-			_.mergeValues( 'data', this, arguments[ 1 ] );
+			Backstab.Util.mergeValues( 'data', this, arguments[ 1 ] );
 			
 			this.on( 'add', this.lengthChanged );
 			this.on( 'remove', this.lengthChanged );
 			this.on( 'reset', this.lengthChanged );
 			
+			Backbone.Collection.apply( this, arguments );
 		},
 		
 		lengthChanged: function() {
@@ -268,13 +270,7 @@
 		}
 		
 		
-	};
-	
-	
-	
-	//
-	Backstab.createConstructor( 'Collection', oOpts, null, Backbone.Collection );
-	
+	} ) );
 	
 	
 } ).call( this );

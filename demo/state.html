@@ -14,9 +14,10 @@
 	<script src="../dependencies/string_format.js" type="text/javascript"></script>
 	<script src="../dependencies/jquery.tmpl.js" type="text/javascript"></script>
 	<script src="../dependencies/state-machine.js" type="text/javascript"></script>
+	<script src="../dependencies/Geko.js" type="text/javascript"></script>
 	
-	<script src="../backstab/underscore.js" type="text/javascript"></script>
-	<script src="../backstab/core.js" type="text/javascript"></script>
+	<script src="../backstab/base.js" type="text/javascript"></script>
+	<script src="../backstab/util.js" type="text/javascript"></script>
 	
 	<script src="../backstab/view.js" type="text/javascript"></script>
 	<script src="../backstab/dispatcher.js" type="text/javascript"></script>
@@ -71,7 +72,7 @@
 		
 		
 		
-		/* /
+		/* */
 		//// states
 		var SliderState = Backstab.StateMachine.extend( {
 			events: [
@@ -91,7 +92,8 @@
 		var goSliderState = new SliderState();
 		/* */
 		
-		/* */
+		
+		/* /
 		var goSliderState = new Backstab.StateMachine( {
 			events: [
 				{ name: 'startup', from: 'none', to: 'transpicker' },
@@ -121,13 +123,13 @@
 			
 			events: {
 				
-				'state:enter:transresults': [ 'setSliderPanel', 'results' ],
-				'state:enter:transdetails': [ 'setSliderPanel', 'details' ],
-				'state:enter:transpicker': [ 'setSliderPanel', 'picker' ],
+				'state:enter:transresults this': [ 'setSliderPanel', 'results' ],
+				'state:enter:transdetails this': [ 'setSliderPanel', 'details' ],
+				'state:enter:transpicker this': [ 'setSliderPanel', 'picker' ],
 				
-				'state:leave:results': [ 'setSliderPanel', 'results' ],
-				'state:leave:details': [ 'setSliderPanel', 'details' ],
-				'state:leave:picker': [ 'setSliderPanel', 'picker' ]
+				'state:leave:results this': [ 'setSliderPanel', 'results' ],
+				'state:leave:details this': [ 'setSliderPanel', 'details' ],
+				'state:leave:picker this': [ 'setSliderPanel', 'picker' ]
 			},
 			
 			tagName: 'ul',
@@ -170,7 +172,7 @@
 				'click #ctl_1': [ 'goTo', 'results' ],
 				'click #ctl_2': [ 'goTo', 'details' ],
 				'click #ctl_3': [ 'goTo', 'picker' ],
-				'state:error:gotodetails': 'showError'			
+				'state:error:gotodetails this': 'showError'			
 			},
 			
 			state: goSliderState,
@@ -192,12 +194,12 @@
 
 			events: {
 				
-				'state:enter:picker': [ 'onPanel', 'Picker' ],
-				'state:enter:results': [ 'onPanel', 'Results Page' ],
-				'state:enter:details': [ 'onPanel', 'Details Page' ],
+				'state:enter:picker this': [ 'onPanel', 'Picker' ],
+				'state:enter:results this': [ 'onPanel', 'Results Page' ],
+				'state:enter:details this': [ 'onPanel', 'Details Page' ],
 				
-				'state:before:{ gotoresults; gotodetails; gotopicker }': [ 'onTransition', 'before:goto...' ],
-				'state:enter:{ transresults; transdetails; transpicker }': [ 'onTransition', 'enter:trans...' ]
+				'state:before:{ gotoresults; gotodetails; gotopicker } this': [ 'onTransition', 'before:goto...' ],
+				'state:enter:{ transresults; transdetails; transpicker } this': [ 'onTransition', 'enter:trans...' ]
 								
 			},
 			
@@ -226,6 +228,7 @@
 			
 			goSliderState.startup();
 						
+			
 		} );
 		
 	</script>

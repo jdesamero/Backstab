@@ -2,8 +2,8 @@ expected = function( actualRes, params, msg ) {
 	
 	var suffix = '';
 	var expectedRes = params._exp;
-	var actualResStr = _.stringify( actualRes );
-	var expectedResStr = _.stringify( expectedRes );
+	var actualResStr = Backstab.Util.stringify( actualRes );
+	var expectedResStr = Backstab.Util.stringify( expectedRes );
 	
 	params._act = actualRes;
 	
@@ -12,7 +12,7 @@ expected = function( actualRes, params, msg ) {
 	}
 	
 	$.each( params, function( k, v ) {
-		msg = msg.replace( '{{%s}}'.printf( k ), _.stringify( v ) );
+		msg = msg.replace( '{{%s}}'.printf( k ), Backstab.Util.stringify( v ) );
 	} );
 	
 	equal( actualRes, expectedRes, '%s%s'.printf( msg, suffix ) );

@@ -27,8 +27,10 @@
 	};
 	
 	
-	// add new methods and properties
-	var oOpts = {
+	
+	//// main
+	
+	Backstab.setNamespace( 'Hash', Backstab.Base.extend( {
 		
 		length: 0,						// length of hash
 		aliasLength: 0,					// length of aliases
@@ -41,7 +43,7 @@
 		
 		defaultKey: null,
 		
-		beforeInit: function( oMembers, oParams ) {
+		constructor: function( oMembers, oParams ) {
 			
 			// do this for instance
 			this.hash = {};
@@ -53,6 +55,7 @@
 			
 			this.set( oMembers );
 			
+			Backstab.Base.apply( this, arguments );
 		},
 		
 		'set': function() {
@@ -213,11 +216,8 @@
 			$.each( this.hash, fEachCb );
 		}
 		
-	};
+	} ) );
 	
-	
-	//
-	Backstab.createConstructor( 'Hash', oOpts );
 	
 } ).call( this );
 

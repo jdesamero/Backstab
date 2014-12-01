@@ -13,9 +13,10 @@
 	
 	<script src="../dependencies/string_format.js" type="text/javascript"></script>
 	<script src="../dependencies/jquery.tmpl.js" type="text/javascript"></script>
+	<script src="../dependencies/Geko.js" type="text/javascript"></script>
 	
-	<script src="../backstab/underscore.js" type="text/javascript"></script>
-	<script src="../backstab/core.js" type="text/javascript"></script>
+	<script src="../backstab/base.js" type="text/javascript"></script>
+	<script src="../backstab/util.js" type="text/javascript"></script>
 	
 	<script src="../backstab/model.js" type="text/javascript"></script>
 	<script src="../backstab/collection.js" type="text/javascript"></script>
@@ -69,8 +70,8 @@
 			events: {
 				'click .edit': 'editItem',
 				'click .del': 'deleteItem',
-				'model:change': 'updateSong',
-				'model:destroy': 'removeSong'
+				'model:change this': 'updateSong',
+				'model:destroy this': 'removeSong'
 			},
 			
 			dispatcher: Backstab.Dispatcher.global,
@@ -116,7 +117,7 @@
 		var ListView = Backstab.View.extend( {
 			
 			events: {
-				'collection:initialize; collection:add': 'addSong'
+				'collection:{ initialize; add } this': 'addSong'
 			},
 			
 			tagName: 'ul',
@@ -144,7 +145,7 @@
 			events: {
 				'click .add': 'addItem',
 				'click .update': 'updateItem',
-				'dispatcher:editSong': 'editSong',
+				'dispatcher:editSong this': 'editSong',
 				'dispatcher:bogus .title': 'fooBar',
 				'dispatcher:blarg .name': 'gooBar'
 			},

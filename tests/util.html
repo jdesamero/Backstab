@@ -3,7 +3,7 @@
 <head>
     
     <meta charset="UTF-8" />
-    <title>QUnit - backstab/underscore.js</title>
+    <title>QUnit - backstab/util.js</title>
 	
 	<link href="../css/qunit-1.15.0.css" rel="stylesheet" type="text/css" />
 	<link href="../css/style.css" rel="stylesheet" type="text/css" />
@@ -13,8 +13,10 @@
 	<script src="../dependencies/backbone-1.1.2.min.js" type="text/javascript"></script>
 	
 	<script src="../dependencies/string_format.js" type="text/javascript"></script>
-
-	<script src="../backstab/underscore.js" type="text/javascript"></script>
+	<script src="../dependencies/Geko.js" type="text/javascript"></script>
+	
+	<script src="../backstab/base.js" type="text/javascript"></script>
+	<script src="../backstab/util.js" type="text/javascript"></script>
 	
 </head>
 
@@ -30,7 +32,7 @@
 
 <script type="text/javascript">
 
-test( '_.beginsWith()', function() {
+test( 'Backstab.Util.beginsWith()', function() {
 	
 	expect( 4 );
 	
@@ -40,7 +42,7 @@ test( '_.beginsWith()', function() {
 		needle: 'The'
 	};
 	expected(
-		_.beginsWith( vals1.haystack, vals1.needle ), vals1,
+		Backstab.Util.beginsWith( vals1.haystack, vals1.needle ), vals1,
 		'{{haystack}} begins with "{{needle}}"'
 	);
 	
@@ -50,7 +52,7 @@ test( '_.beginsWith()', function() {
 		needle: 'The'
 	};	
 	expected(
-		_.beginsWith( vals2.haystack, vals2.needle ), vals2,
+		Backstab.Util.beginsWith( vals2.haystack, vals2.needle ), vals2,
 		'{{haystack}} does not begin with "{{needle}}"'
 	);
 	
@@ -60,7 +62,7 @@ test( '_.beginsWith()', function() {
 		needle: [ 'quick', 'brown', 'fox' ]
 	};
 	expected(
-		_.beginsWith( vals3.haystack, vals3.needle ), vals3,
+		Backstab.Util.beginsWith( vals3.haystack, vals3.needle ), vals3,
 		'{{haystack}} begins with "quick", "brown", or "fox"'
 	);
 	
@@ -70,25 +72,25 @@ test( '_.beginsWith()', function() {
 		needle: [ 'quick', 'brown', 'fox' ]
 	};
 	expected(
-		_.beginsWith( vals4.haystack, vals4.needle ), vals4,
+		Backstab.Util.beginsWith( vals4.haystack, vals4.needle ), vals4,
 		'{{haystack}} does not begin with "quick", "brown", or "fox"'
 	);
 	
 } );
 
-test( '_.expandCurlyShortform()', function() {
+test( 'Backstab.Util.expandCurlyShortform()', function() {
 	
 	expect( 5 );
 	
 	var vals1 = { _exp: 'click a' };
 	expected(
-		_.expandCurlyShortform( vals1._exp ), vals1,
+		Backstab.Util.expandCurlyShortform( vals1._exp ), vals1,
 		'Value {{_act}} should not change.'
 	);
 	
 	var vals2 = { _exp: 'click #a, #b, #c' };
 	expected(
-		_.expandCurlyShortform( vals2._exp ), vals2,
+		Backstab.Util.expandCurlyShortform( vals2._exp ), vals2,
 		'Value {{_act}} should not change.'
 	);
 
@@ -97,7 +99,7 @@ test( '_.expandCurlyShortform()', function() {
 		arg: 'foo:{ bar; baz }'
 	};
 	expected(
-		_.expandCurlyShortform( vals3.arg ), vals3,
+		Backstab.Util.expandCurlyShortform( vals3.arg ), vals3,
 		'Value {{arg}} should change to {{_exp}}.'
 	);
 	
@@ -106,7 +108,7 @@ test( '_.expandCurlyShortform()', function() {
 		arg: 'foo:{ bar; baz; }'
 	};
 	expected(
-		_.expandCurlyShortform( vals4.arg ), vals4,
+		Backstab.Util.expandCurlyShortform( vals4.arg ), vals4,
 		'Value {{arg}} should change to {{_exp}}.'
 	);
 	
@@ -115,13 +117,13 @@ test( '_.expandCurlyShortform()', function() {
 		arg: 'foo:{ bar; baz } div > a; fruit:type:{ apple div; pear p; grape } .one, .two'
 	};
 	expected(
-		_.expandCurlyShortform( vals5.arg ), vals5,
+		Backstab.Util.expandCurlyShortform( vals5.arg ), vals5,
 		'Value {{arg}} should change to {{_exp}}.'
 	);
 	
 } );
 
-test( '_.descendant()', function() {
+test( 'Backstab.Util.descendant()', function() {
 	
 	expect( 7 );
 	
@@ -146,7 +148,7 @@ test( '_.descendant()', function() {
 		}
 	};
 	
-	var res1 = _.descendant( oTest );
+	var res1 = Backstab.Util.descendant( oTest );
 	var vals1 = { _exp: 'John Doe' };
 	expected(
 		res1.name, vals1,
@@ -155,30 +157,30 @@ test( '_.descendant()', function() {
 	
 	var vals2 = { _exp: 'John Doe', arg: 'name' };
 	expected(
-		_.descendant( oTest, vals2.arg ), vals2,
-		'_.descendant( oTest, {{arg}} ) should be {{_exp}}.'
+		Backstab.Util.descendant( oTest, vals2.arg ), vals2,
+		'Backstab.Util.descendant( oTest, {{arg}} ) should be {{_exp}}.'
 	);
 	
 	var vals3 = { _exp: 'Sky', arg: 'color.blue' };
 	expected(
-		_.descendant( oTest, vals3.arg ), vals3,
-		'_.descendant( oTest, {{arg}} ) should be {{_exp}}.'
+		Backstab.Util.descendant( oTest, vals3.arg ), vals3,
+		'Backstab.Util.descendant( oTest, {{arg}} ) should be {{_exp}}.'
 	);
 	
 	var vals4 = { _exp: 'M6K 9H6', arg: 'address.shipping.postal' };
 	expected(
-		_.descendant( oTest, vals4.arg ), vals4,
-		'_.descendant( oTest, {{arg}} ) should be {{_exp}}.'
+		Backstab.Util.descendant( oTest, vals4.arg ), vals4,
+		'Backstab.Util.descendant( oTest, {{arg}} ) should be {{_exp}}.'
 	);
 	
-	var res5 = _.descendant( oTest, 'color' );
+	var res5 = Backstab.Util.descendant( oTest, 'color' );
 	var vals5 = { _exp: 'Leaf' };
 	expected(
 		res5.green, vals5,
 		'res5.green should be {{_exp}}.'
 	);
 	
-	var res6 = _.descendant( oTest, 'address.billing' );
+	var res6 = Backstab.Util.descendant( oTest, 'address.billing' );
 	var vals6 = { _exp: '4031 Rue Megantic' };
 	expected(
 		res6.street, vals6,
@@ -187,22 +189,22 @@ test( '_.descendant()', function() {
 	
 	var vals7 = { _exp: false, arg: 'some.bogus.path' };
 	expected(
-		_.descendant( oTest, vals7.arg ), vals7,
-		'_.descendant( oTest, {{arg}} ) should be {{_exp}}.'
+		Backstab.Util.descendant( oTest, vals7.arg ), vals7,
+		'Backstab.Util.descendant( oTest, {{arg}} ) should be {{_exp}}.'
 	);
 	
 } );
 
 
-test( '_.mergeValues()', function() {
+test( 'Backstab.Util.mergeValues()', function() {
 	
 	expect( 3 );
 	
 	var oTarget = { data: { id: 101, title: 'Untitled' } };
 	var oParams = { data: { title: 'Params Title', params: '1 2 3' } };
 	
-	_.mergeValues( 'data', oTarget, oParams );
-	_.mergeValues( 'data', oTarget, null );			// should have no effect
+	Backstab.Util.mergeValues( 'data', oTarget, oParams );
+	Backstab.Util.mergeValues( 'data', oTarget, null );			// should have no effect
 	
 	
 	var vals1 = { _exp: 101 };

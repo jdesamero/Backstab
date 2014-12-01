@@ -16,11 +16,11 @@
 	
 	
 	// add new methods and properties
-	var oOpts = {
+	Backstab.setNamespace( 'Generic', Backstab.Base.extend( {
 		
 		params: null,
 		
-		beforeInit: function( oParams ) {
+		constructor: function( oParams ) {
 			
 			this.params = {};				// do this for instance
 			
@@ -28,6 +28,7 @@
 				$.extend( this.params, oParams );
 			}
 			
+			Backstab.Base.apply( this, arguments );
 		},
 		
 		'get': function( sKey ) {
@@ -72,10 +73,8 @@
 			return this;
 		}
 		
-	};
+	} ) );
 	
-	//
-	Backstab.createConstructor( 'Generic', oOpts );
 	
 } ).call( this );
 

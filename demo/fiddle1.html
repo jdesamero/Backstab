@@ -12,9 +12,10 @@
 	<script src="../dependencies/backbone-1.1.2.min.js" type="text/javascript"></script>
 	
 	<script src="../dependencies/jquery.tmpl.js" type="text/javascript"></script>
+	<script src="../dependencies/Geko.js" type="text/javascript"></script>
 	
-	<script src="../backstab/underscore.js" type="text/javascript"></script>
-	<script src="../backstab/core.js" type="text/javascript"></script>
+	<script src="../backstab/base.js" type="text/javascript"></script>
+	<script src="../backstab/util.js" type="text/javascript"></script>
 	
 	<script src="../backstab/view.js" type="text/javascript"></script>
 	<script src="../backstab/dispatcher.js" type="text/javascript"></script>
@@ -60,15 +61,15 @@
 			fooBar: function( e, val ) {
 				// $( e.target ).html( val );
 				// alert( $( e.target ).prop( 'tagName' ) );
-				// _.showMe( val );
-				_.showMe( e );
+				// Backstab.Util.showMe( val );
+				Backstab.Util.showMe( e );
 			},
 
 			gooBar: function( e, val ) {
 				// $( e.target ).html( val );
 				// alert( $( e.target ).prop( 'tagName' ) );
-				// _.showMe( val );
-				_.showMe( e );
+				// Backstab.Util.showMe( val );
+				Backstab.Util.showMe( e );
 			}
 			
 		} );
@@ -121,7 +122,7 @@
 				return false;
 			} );
 
-			// alert( _.beginsWith( 'spiderball is cute!', [ 'rat', 'furdi', 'pudgy' ] ) );
+			// alert( Backstab.Util.beginsWith( 'spiderball is cute!', [ 'rat', 'furdi', 'pudgy' ] ) );
 			
 			/* /
 			var test = {
@@ -132,7 +133,7 @@
 			
 			delete test.type;
 			
-			_.showMe( test );
+			Backstab.Util.showMe( test );
 			/* */
 
 			var test = {
@@ -161,8 +162,8 @@
 
 			//
 			$( '#ctl_7' ).click( function() {
-				// _.showMe( _.descendant( test, 'doEwt.color' ) );
-				_.showMe( _.descendant( test, 'fruit.red.meat' ) );
+				// Backstab.Util.showMe( Backstab.Util.descendant( test, 'doEwt.color' ) );
+				Backstab.Util.showMe( Backstab.Util.descendant( test, 'fruit.red.meat' ) );
 				return false;
 			} );
 			
