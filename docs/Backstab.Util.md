@@ -1,19 +1,19 @@
-Backstab (Underscore.js Enhancements)
+Backstab.Util
 ---------------------------------------
 
-Backstab adds some more utility functions to the Underscore.js namespace.
+Backstab.Util provides some useful utility functions and helpers.
 
 The following functions are added:
 
-- ``_.beginsWith( haystack, needle, greedy )``. _&lt;content to come&gt;_
-- ``_.expandCurlyShortform( expression )``. _&lt;content to come&gt;_
-- ``_.descendant( object, path )``. _&lt;content to come&gt;_
-- ``_.objectType( object )``. _&lt;content to come&gt;_
-- ``_.descendantsWithMethod( subject, method, maxLevels )``. _&lt;content to come&gt;_
-- ``_.stringify( arg1, arg2, ... argN )``. _&lt;content to come&gt;_
-- ``_.showMe( arg1, arg2, ... argN )``. _&lt;content to come&gt;_
-- ``_.mergeValues( key, target, params )``. _&lt;content to come&gt;_
+- ``Backstab.Util.beginsWith( haystack, needle, greedy )``. _&lt;content to come&gt;_
+- ``Backstab.Util.expandCurlyShortform( expression )``. _&lt;content to come&gt;_
+- ``Backstab.Util.descendant( object, path )``. _&lt;content to come&gt;_
+- ``Backstab.Util.objectType( object )``. _&lt;content to come&gt;_
+- ``Backstab.Util.descendantsWithMethod( subject, method, maxLevels )``. _&lt;content to come&gt;_
+- ``Backstab.Util.stringify( arg1, arg2, ... argN )``. _&lt;content to come&gt;_
+- ``Backstab.Util.showMe( arg1, arg2, ... argN )``. _&lt;content to come&gt;_
+- ``Backstab.Util.mergeValues( key, target, params )``. _&lt;content to come&gt;_
 
-The following functions are overloaded, original functionality should not be affected:
+The following functions provides enhancements to their underscore.js counterparts:
 
-- ``_.contains( subject, value )``. _&lt;content to come&gt;_
+- ``Backstab.Util.contains( subject, value )``. _&lt;content to come&gt;_
