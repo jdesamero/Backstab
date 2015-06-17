@@ -106,14 +106,44 @@
 		
 		var oFamily = {
 			
-			setData: function( oData ) {
+			// allow family members to easily access shared information
+			setData: function() {
 				
 				if ( !oFamily.data ) {
 					oFamily.data = {};
 				}
 				
-				_.extend( oFamily.data, oData );
+				var iArgLen = arguments.length;
+				
+				if ( 1 === iArgLen ) {
+					
+					// object provided to be merged
+					_.extend( oFamily.data, arguments[ 0 ] );
+					
+				} else if ( 2 === iArgLen ) {
+					
+					// key/value pair provided
+					oFamily.data[ arguments[ 0 ] ] = arguments[ 1 ];
+					
+				}
+				
+				return oFamily;
+			},
+			
+			
+			// allow to change model's field properties after declaring
+			// useful if we don't have immediate access to params before declaration
+			setFields: function( oFields ) {
+				
+				if ( oFamily.Model ) {
+					oFamily.Model.prototype.fields = oFields;
+				} else {
+					throw 'Backstab.family.setFields(): family has no Model defined!';
+				}
+				
+				return oFamily;
 			}
+			
 			
 		};
 		
@@ -134,10 +164,21 @@
 			
 			modelExt = familySetup( modelExt, opts.model, function( ext, params ) {
 				
+				var sDelim = '?';
+				
 				if ( 'srv' == params.autoUrl ) {
-					ext.url = '%s/%s'.printf( opts.script.srv, opts.name );
+					
+					ext.url = '%s/%s/'.printf( opts.script.srv, opts.name );
+				
 				} else if ( 'ajax_content' == params.autoUrl ) {
+					
 					ext.url = '%s&section=%s'.printf( opts.script.ajax_content, opts.name );
+					sDelim = '&';
+					
+				}
+				
+				if ( params.params ) {
+					ext.url = '%s%s%s'.printf( ext.url, sDelim, params.params );
 				}
 				
 				return ext;
@@ -172,6 +213,8 @@
 					ext.url = '%s&section=%s'.printf( opts.script.ajax_content, opts.namePlural );
 				}
 				
+				
+				// override backbone's default parse() method
 				if ( params.parseInfo ) {
 					
 					ext.parse = function( response, options ) {
@@ -222,6 +265,10 @@
 				},
 				
 				initialize: function( options2 ) {
+					
+					if ( this.status ) {
+						this.status.setElem( this.$el );
+					}
 					
 					if ( ivPrms.postInit ) {
 						ivPrms.postInit.call( this, options2 );
@@ -293,6 +340,10 @@
 			}
 			
 			itemViewExt = familySetup( itemViewExt, opts.itemView, function( ext, params ) {
+				
+				if ( params.status ) {
+					ext.status = new params.status();
+				}
 				
 				return ext;
 				
