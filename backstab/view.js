@@ -60,7 +60,8 @@
 			var sels = [
 				'.%s'.printf( prop ),
 				'#%s'.printf( prop ),
-				'input[name="%s"]'.printf( prop )
+				'input[name="%s"]'.printf( prop ),
+				'[data-field="%s"]'.printf( prop )
 			];
 			
 			$.each( sels, function( i, sel2 ) {
@@ -346,7 +347,7 @@
 						ret[ prop ] = oIntCidModel.getIntCid();
 					}
 					
-				} else if ( oParams[ sValKey ] ) {
+				} else if ( 'undefined' !== $.type( oParams[ sValKey ] ) ) {
 					
 					ret[ prop ] = oParams[ sValKey ];
 					
@@ -372,11 +373,27 @@
 							var sProp = oFormat[ prop ];
 							
 							if ( -1 !== $.inArray( sProp, [ 'int', 'integer', 'number' ] ) ) {
+								
 								mValue = parseInt( mValue );
+							
 							} else if ( 'float' === sProp ) {
+								
 								mValue = parseFloat( mValue );
+							
 							} else if ( -1 !== $.inArray( sProp, [ 'bool', 'boolean' ] ) ) {
+								
+								// if mValue is string, and has value of '0' or 'false'
+								// then assert it's falseness
+								
+								if ( 'string' === $.type( mValue ) ) {
+									mValue = $.trim( mValue );
+									if ( ( '0' === mValue ) || ( 'false' === mValue ) ) {
+										mValue = false;
+									}
+								}
+								
 								mValue = ( mValue ) ? true : false ;
+								
 							}
 							
 						}
@@ -403,7 +420,7 @@
 		},
 		
 		
-		// update the sort order of models base on the given:
+		// update the sort order of models based on the given:
 		// sSel: list element selector, sFldKey: sort field key
 		updateModelSortOrder: function( sSel, sFldKey ) {
 			

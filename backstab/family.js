@@ -268,8 +268,8 @@
 				
 				initialize: function( options2 ) {
 					
-					if ( this.status ) {
-						this.status.setElem( this.$el );
+					if ( ivPrms.status ) {
+						this.status = new ivPrms.status( this.$el );
 					}
 					
 					if ( ivPrms.postInit ) {
@@ -345,10 +345,6 @@
 			}
 			
 			itemViewExt = familySetup( itemViewExt, opts.itemView, function( ext, params ) {
-				
-				if ( params.status ) {
-					ext.status = new params.status();
-				}
 				
 				return ext;
 				
@@ -483,6 +479,10 @@
 				},
 				
 				initialize: function( options2 ) {
+					
+					if ( fvPrms.status ) {
+						this.status = new fvPrms.status( this.$el );
+					}
 					
 					if ( fvPrms.postInit ) {
 						fvPrms.postInit.call( this, options2 );
